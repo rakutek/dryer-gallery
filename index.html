@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f3b73">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="乾燥機OK服">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>乾燥機OKな服ギャラリー｜楽さん用</title>
+<style>
+:root{
+  --bg:#f6f7f9;--card:#fff;--ink:#1d232b;--muted:#6b7480;--line:#e3e6ea;--accent:#2f6fec;
+  --ok:#1f9d55;--ok-bg:#e3f6ea;--unk:#a66b00;--unk-bg:#fff4d1;--ng:#d0342c;--ng-bg:#fde6e4;
+  --radius:14px;--shadow:0 1px 2px rgba(16,24,40,.06),0 4px 14px rgba(16,24,40,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+header.top{background:linear-gradient(135deg,#1f3b73,#2f6fec);color:#fff;padding:22px 20px 18px}
+.wrap{max-width:1200px;margin:0 auto}
+header.top h1{margin:0;font-size:clamp(20px,3.2vw,28px);letter-spacing:.02em}
+header.top p{margin:4px 0 0;opacity:.85;font-size:14px}
+.toolbar{position:sticky;top:0;z-index:20;background:rgba(246,247,249,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.toolbar .wrap{padding:12px 20px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.search{flex:1 1 240px;position:relative}
+.search input{width:100%;padding:10px 12px 10px 36px;border:1px solid var(--line);border-radius:10px;font-size:15px;background:#fff}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted)}
+select,input,textarea,button{font:inherit}
+.ctl{padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:14px;color:var(--ink)}
+.price{display:flex;align-items:center;gap:4px}
+.price input{width:92px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 14px;font-size:14px;cursor:pointer;color:var(--ink);white-space:nowrap}
+.btn:hover{background:#f0f2f5}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#255fd0}
+.btn.danger{color:var(--ng);border-color:#f3c2be}
+.btn.small{padding:6px 10px;font-size:13px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer;user-select:none}
+.chip[aria-pressed="true"].s-ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.chip[aria-pressed="true"].s-unknown{background:var(--unk-bg);border-color:#e0b100;color:var(--unk)}
+.chip[aria-pressed="true"].s-ng{background:var(--ng-bg);border-color:var(--ng);color:var(--ng)}
+.more{display:none}
+.summary{max-width:1200px;margin:0 auto;padding:14px 20px 0;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+main .grid{max-width:1200px;margin:0 auto;padding:14px 20px 40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;border:1px solid #eef0f3;transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(16,24,40,.06),0 10px 24px rgba(16,24,40,.1)}
+.thumb{position:relative;aspect-ratio:1/1;background:#f1f3f5;display:block}
+.thumb img{width:100%;height:100%;object-fit:contain;display:block;background:#fff}
+.badge{position:absolute;left:10px;top:10px;font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.b-ok{background:var(--ok-bg);color:var(--ok);border:1px solid #9fdcb6}
+.b-unknown{background:var(--unk-bg);color:var(--unk);border:1px solid #f0d27a}
+.b-ng{background:var(--ng-bg);color:var(--ng);border:1px solid #f3b3ad}
+.mine{position:absolute;right:10px;top:10px;font-size:11px;background:#1d232b;color:#fff;padding:3px 8px;border-radius:999px}
+.sale{position:absolute;right:10px;bottom:10px;font-size:12px;font-weight:700;background:var(--ng);color:#fff;padding:3px 8px;border-radius:6px}
+.body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.brand{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.name{font-size:15px;font-weight:700;margin:0;line-height:1.4}
+.prices{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.prices .now{font-size:18px;font-weight:800}
+.prices .now.onsale{color:var(--ng)}
+.prices .list{font-size:13px;color:var(--muted);text-decoration:line-through}
+.meta{font-size:13px;color:#39424e;display:grid;grid-template-columns:auto 1fr;gap:2px 8px}
+.meta dt{color:var(--muted)}
+.meta dd{margin:0}
+.evidence{font-size:11.5px;color:#5b6573;border-left:3px solid #d5dbe3;padding:2px 0 2px 8px;margin:0;line-height:1.45}
+.evidence b{color:#39424e;font-weight:600}
+.catbar{max-width:1200px;margin:0 auto;padding:12px 20px 0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.catbar::-webkit-scrollbar{display:none}
+.catchip{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:13px;cursor:pointer;white-space:nowrap;color:var(--ink)}
+.catchip small{color:var(--muted);margin-left:4px}
+.catchip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.catchip[aria-pressed="true"] small{color:#cfd5dd}
+.note{font-size:13px;color:#4a5361;background:#f6f7f9;border-radius:8px;padding:6px 9px;margin:0}
+.actions{margin-top:auto;padding-top:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.actions .link{flex:1;text-align:center;text-decoration:none;background:var(--ink);color:#fff;border-radius:9px;padding:8px 10px;font-size:13px;font-weight:600}
+.actions .link:hover{background:#000}
+.actions .nolink{flex:1;text-align:center;font-size:12px;color:var(--muted)}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:60px 10px}
+dialog{border:none;border-radius:16px;padding:0;width:min(560px,94vw);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(15,20,30,.45)}
+dialog form{padding:20px}
+dialog h2{margin:0 0 12px;font-size:18px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fgrid label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.fgrid label.full{grid-column:1/-1}
+.fgrid input,.fgrid select,.fgrid textarea{padding:9px 10px;border:1px solid var(--line);border-radius:9px;font-size:15px;color:var(--ink);background:#fff}
+.fgrid textarea{min-height:64px;resize:vertical}
+.req{color:var(--ng)}
+.dlg-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.preview{grid-column:1/-1;display:flex;gap:10px;align-items:center;font-size:12px;color:var(--muted)}
+.preview img{width:64px;height:64px;object-fit:contain;border:1px solid var(--line);border-radius:8px;background:#fff}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#1d232b;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:50}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+footer{max-width:1200px;margin:0 auto;padding:0 20px 30px;color:var(--muted);font-size:12px}
+@media (max-width:720px){
+  .catbar{padding:10px 12px 0}
+  .evidence{font-size:11px}
+  .toolbar .wrap{gap:8px;padding:10px 12px}
+  .more-toggle{display:inline-block}
+  .more{display:none;width:100%;flex-wrap:wrap;gap:8px}
+  .more.open{display:flex}
+  .more .ctl{flex:1 1 140px}
+  .price{flex:1 1 100%}
+  .price input{flex:1;width:auto}
+  main .grid{grid-template-columns:repeat(2,1fr);gap:10px;padding:10px 12px 30px}
+  .body{padding:10px}
+  .name{font-size:13px}
+  .prices .now{font-size:16px}
+  .meta{font-size:12px;grid-template-columns:1fr}
+  .meta dt{display:none}
+  .note{font-size:12px}
+  .badge{font-size:10px;padding:3px 7px;left:6px;top:6px}
+  .fgrid{grid-template-columns:1fr}
+  .summary{padding:10px 12px 0}
+}
+@media (min-width:721px){.more{display:contents}.more-toggle{display:none}}
+@media (max-width:380px){main .grid{grid-template-columns:1fr}}
+
+/* ---- cart (気になるリスト) ---- */
+.cartbtn{position:relative;display:inline-flex;align-items:center;gap:6px}
+.cartbtn .cnt{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--ng);color:#fff;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.cartbtn .cnt.zero{background:#c3c9d1}
+.chip.c-cart[aria-pressed="true"]{background:#fff1e0;border-color:#e8892b;color:#b85c00}
+.actions .cart-add{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 10px;font-size:13px;cursor:pointer;white-space:nowrap;color:var(--ink)}
+.actions .cart-add:hover{background:#f6f2ea}
+.actions .cart-add.in{background:#fff1e0;border-color:#e8892b;color:#b85c00;font-weight:700}
+.card.incart{outline:2px solid #f3b36b}
+.incart-tag{position:absolute;right:10px;top:10px;font-size:11px;background:#e8892b;color:#fff;padding:3px 8px;border-radius:999px}
+.card .mine+.incart-tag{top:34px}
+.cart-ov{position:fixed;inset:0;background:rgba(15,20,30,.4);z-index:60;opacity:0;pointer-events:none;transition:opacity .2s}
+.cart-ov.open{opacity:1;pointer-events:auto}
+.cart{position:fixed;top:0;right:0;height:100%;width:min(420px,100vw);background:#fff;z-index:61;box-shadow:-10px 0 40px rgba(0,0,0,.18);display:flex;flex-direction:column;transform:translateX(105%);transition:transform .25s ease}
+.cart.open{transform:none}
+.cart-h{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}
+.cart-h h2{margin:0;font-size:17px}
+.cart-h .x{border:none;background:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1;padding:4px 8px}
+.cart-sub{font-size:12px;color:var(--muted);padding:6px 16px 0}
+.cart-list{flex:1;overflow-y:auto;padding:8px 12px;margin:0;list-style:none}
+.cart-item{display:grid;grid-template-columns:64px 1fr;gap:10px;padding:10px 4px;border-bottom:1px solid #f0f2f5}
+.cart-item img{width:64px;height:64px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:8px}
+.cart-item .ci-brand{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.cart-item .ci-name{font-size:13.5px;font-weight:700;line-height:1.35;margin:1px 0 3px}
+.cart-item .ci-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px}
+.cart-item .ci-price{font-weight:800;font-size:14px}
+.cart-item .ci-st{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:999px}
+.cart-item input.memo{grid-column:2;width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:8px;font-size:13px;margin-top:4px}
+.cart-item .ci-acts{display:flex;gap:10px;align-items:center;margin-top:4px;font-size:12.5px}
+.cart-item .ci-acts button{border:none;background:none;color:var(--ng);cursor:pointer;padding:0;font-size:12.5px}
+.cart-empty{text-align:center;color:var(--muted);padding:50px 10px;font-size:14px}
+.cart-f{border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
+.cart-total{display:flex;justify-content:space-between;align-items:baseline;font-size:14px}
+.cart-total b{font-size:20px}
+.cart-f .row{display:flex;gap:8px}
+.cart-f .row .btn{flex:1}
+.cart-note{font-size:11px;color:var(--muted);margin:0}
+@media (max-width:720px){
+  .cart{top:auto;bottom:0;left:0;right:0;width:100%;height:auto;max-height:85vh;border-radius:16px 16px 0 0;transform:translateY(105%);box-shadow:0 -10px 40px rgba(0,0,0,.2)}
+  .cart.open{transform:none}
+  .cart-h{position:relative;padding-top:18px}
+  .cart-h::before{content:"";position:absolute;left:50%;top:7px;width:40px;height:4px;border-radius:4px;background:#d5dbe3;transform:translateX(-50%)}
+  .actions .cart-add{padding:6px 8px;font-size:12px}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <h1>乾燥機OKな服ギャラリー</h1>
+  <p>楽さん用 ・ タンブル乾燥に対応しているかを一覧でチェック</p>
+</div></header>
+
+<div class="toolbar"><div class="wrap">
+  <div class="search">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="ブランド・商品名・素材・メモで検索" aria-label="検索">
+  </div>
+  <div class="chips" id="statusChips" role="group" aria-label="乾燥機ステータス">
+    <span class="chip s-ok" data-s="ok" aria-pressed="false" role="button" tabindex="0">乾燥機OK</span>
+    <span class="chip s-unknown" data-s="unknown" aria-pressed="false" role="button" tabindex="0">未確認</span>
+    <span class="chip s-ng" data-s="ng" aria-pressed="false" role="button" tabindex="0">NG</span>
+    <span class="chip c-cart" id="cartOnly" aria-pressed="false" role="button" tabindex="0">🛒 カートのみ表示</span>
+  </div>
+  <button class="btn more-toggle" id="moreToggle" type="button">絞り込み ▾</button>
+  <div class="more" id="more">
+    <select id="brand" class="ctl" aria-label="ブランド"><option value="">すべてのブランド</option></select>
+    <select id="cat" class="ctl" aria-label="カテゴリ"><option value="">すべてのカテゴリ</option></select>
+    <div class="price"><input id="pmin" class="ctl" type="number" inputmode="numeric" min="0" step="100" placeholder="¥ 下限" aria-label="価格下限"><span>〜</span><input id="pmax" class="ctl" type="number" inputmode="numeric" min="0" step="100" placeholder="¥ 上限" aria-label="価格上限"></div>
+    <select id="sort" class="ctl" aria-label="並び替え">
+      <option value="default">おすすめ順（OK優先）</option>
+      <option value="price-asc">価格が安い順</option>
+      <option value="price-desc">価格が高い順</option>
+      <option value="added">登録順</option>
+    </select>
+    <button class="btn" id="reset" type="button">リセット</button>
+  </div>
+  <button class="btn cartbtn" id="cartBtn" type="button" aria-haspopup="dialog" aria-controls="cart">🛒 カート <span class="cnt zero" id="cartCount">0</span></button>
+  <button class="btn primary" id="addBtn" type="button">＋ アイテム追加</button>
+</div></div>
+
+<nav class="catbar" id="catbar" aria-label="カテゴリ"></nav>
+
+<div class="summary"><span id="count"></span>
+  <span>
+    <button class="btn small" id="exportBtn" type="button">JSONエクスポート</button>
+    <button class="btn small" id="importBtn" type="button">JSONインポート</button>
+    <input id="importFile" type="file" accept="application/json,.json" hidden>
+  </span>
+</div>
+
+<main><div class="grid" id="grid"></div></main>
+
+<footer>
+  価格・在庫・洗濯表示は登録時点の情報です。購入前に各商品ページで最新情報をご確認ください。追加したアイテムはこのブラウザ（localStorage）に保存されます。
+</footer>
+
+<dialog id="dlg">
+  <form id="form" method="dialog">
+    <h2 id="dlgTitle">アイテム追加</h2>
+    <div class="fgrid">
+      <label class="full">商品URL<input name="url" type="url" placeholder="https://..."></label>
+      <label>ブランド <span class="req">*</span><input name="brand" required list="brandList"></label>
+      <label>カテゴリ<input name="category" list="catList" placeholder="ロンT"></label>
+      <label class="full">商品名 <span class="req">*</span><input name="name" required></label>
+      <label>価格（税込・円） <span class="req">*</span><input name="price" type="number" min="0" step="1" required></label>
+      <label>定価（セール時のみ）<input name="listPrice" type="number" min="0" step="1"></label>
+      <label>素材<input name="fabric" placeholder="ポリエステル100%"></label>
+      <label>乾燥機ステータス
+        <select name="status">
+          <option value="ok">乾燥機OK（公式確認）</option>
+          <option value="unknown" selected>未確認</option>
+          <option value="ng">NG</option>
+        </select>
+      </label>
+      <label class="full">ステータス補足<input name="statusDetail" placeholder="例：低温OK（公式）/ 洗濯表示で不可"></label>
+      <label class="full">根拠・出典メモ<input name="evidence" placeholder="例：公式ページの洗濯表示「タンブル乾燥（低温）」"></label>
+      <label class="full">メモ<textarea name="note" placeholder="厚さ・シルエット・在庫など"></textarea></label>
+      <label class="full">画像URL<input name="image" type="url" placeholder="https://...jpg"></label>
+      <div class="preview"><img id="pv" alt=""><span>画像プレビュー（読み込めない場合はプレースホルダー表示）</span></div>
+    </div>
+    <input type="hidden" name="id">
+    <div class="dlg-actions">
+      <button class="btn" value="cancel" type="button" id="cancelBtn">キャンセル</button>
+      <button class="btn primary" type="submit" id="saveBtn">保存</button>
+    </div>
+  </form>
+</dialog>
+<datalist id="brandList"></datalist><datalist id="catList"></datalist>
+<div class="cart-ov" id="cartOv"></div>
+<aside class="cart" id="cart" role="dialog" aria-modal="true" aria-labelledby="cartTitle" aria-hidden="true">
+  <div class="cart-h"><h2 id="cartTitle">🛒 カート（気になるリスト）</h2><button class="x" id="cartClose" type="button" aria-label="閉じる">×</button></div>
+  <div class="cart-sub" id="cartSub"></div>
+  <ul class="cart-list" id="cartList"></ul>
+  <div class="cart-f">
+    <div class="cart-total"><span>合計（<span id="cartN">0</span>点）</span><b id="cartTotal">¥0</b></div>
+    <div class="row"><button class="btn primary" id="cartCopy" type="button">📋 リストをコピー</button><button class="btn danger" id="cartClear" type="button">すべて削除</button></div>
+    <p class="cart-note">購入機能ではありません（候補リスト）。購入は各商品ページで。カートはこのブラウザに保存されます。</p>
+  </div>
+</aside>
+<div class="toast" id="toast"></div>
+
+<script id="seed-data" type="application/json">{"version": 5, "updated": "2026-10-18", "items": [{"id": "patagonia-73-skyline", "category": "ロンT", "brand": "Patagonia", "name": "メンズ・ロングスリーブ・'73 スカイライン・ポケット・レスポンシビリティー", "url": "https://www.patagonia.jp/product/mens-long-sleeved-73-skyline-pocket-responsibili-tee/37743.html", "price": 5775, "listPrice": 8250, "fabric": "再生綿50%/再生ポリ50%", "status": "ok", "statusDetail": "乾燥機低温OK（公式）", "note": "胸ポケ付きクルーネック、今季は薄めとのレビュー", "image": "images/patagonia-73-skyline.jpg", "evidence": "初期リスト（ユーザー提供）より：乾燥機低温OK（公式）"}, {"id": "montbell-wic-border", "category": "ロンT", "brand": "mont-bell", "name": "WIC.ボーダーロングスリーブT", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=1104818", "price": 5200, "listPrice": null, "fabric": "ポリエステル（ウイックロン）", "status": "ok", "statusDetail": "OK 排気80℃まで（公式）", "note": "リブ編みボーダー", "image": "images/montbell-wic-border.jpg", "evidence": "初期リスト（ユーザー提供）より：OK 排気80℃まで（公式）"}, {"id": "tnf-enride", "category": "ロンT", "brand": "THE NORTH FACE", "name": "ロングスリーブエンライドティー NT82560", "url": "https://www.goldwin.co.jp/ap/item/i/m/NT82560?outlet", "price": 8470, "listPrice": 12100, "fabric": "ポリエステル100%", "status": "unknown", "statusDetail": "", "note": "厚手・リラックス・胸ポケ、残りわずか", "image": "images/tnf-enride.jpg", "evidence": "初期リスト（ユーザー提供）より：公式の乾燥機可否は未確認"}, {"id": "dddddd-wide-tech", "category": "ロンT", "brand": "dDdDdDd", "name": "WIDE TECH LONG-SLEEVE T-SHIRTS", "url": "https://www.urban-research.jp/shop/g/gUD26130-1011016/", "price": 13200, "listPrice": null, "fabric": "ポリエステル100%（SOLOTEX）", "status": "unknown", "statusDetail": "", "note": "ヘビーウェイト・ワイド・日本製", "image": "images/dddddd-wide-tech.jpg", "evidence": "初期リスト（ユーザー提供）より：公式の乾燥機可否は未確認"}, {"id": "muji-rib-knit", "category": "ロンT", "brand": "無印良品", "name": "乾きやすい洗えるリブ編み長袖ニットＴシャツ", "url": "https://www.muji.com/jp/ja/store/cmdty/detail/4548076752899", "price": 2990, "listPrice": 3990, "fabric": "ポリエステル100%", "status": "unknown", "statusDetail": "", "note": "やや厚手・ボックス", "image": "images/muji-rib-knit.jpg", "evidence": "初期リスト（ユーザー提供）より：公式の乾燥機可否は未確認"}, {"id": "sop-comfort", "category": "ロンT", "brand": "SENSE OF PLACE", "name": "コンフォートロングTシャツ", "url": "https://www.urban-research.jp/shop/g/gAA26330-1013001/", "price": 4400, "listPrice": null, "fabric": "ポリ52%/綿48%", "status": "unknown", "statusDetail": "", "note": "イージーケア", "image": "images/sop-comfort.jpg", "evidence": "初期リスト（ユーザー提供）より：公式の乾燥機可否は未確認"}, {"id": "tnf-airy-relax", "category": "ロンT", "brand": "THE NORTH FACE", "name": "ロングスリーブ エアリー リラックス ティー NT62160", "url": "https://gsmall.jp/all/00133/73735/", "price": 5236, "listPrice": null, "fabric": "ポリエステル100%", "status": "unknown", "statusDetail": "", "note": "アンチリンクル・白のみ", "image": "images/tnf-airy-relax.jpg", "evidence": "初期リスト（ユーザー提供）より：公式の乾燥機可否は未確認"}, {"id": "freshservice-dry-jersey", "category": "ロンT", "brand": "FreshService", "name": "DRY JERSEY L/S CREW NECK TEE", "url": "https://freshservice.jp/products/fsc261-70164b", "price": 11000, "listPrice": null, "fabric": "ポリエステル100%", "status": "unknown", "statusDetail": "", "note": "オーバーサイズ・在庫少", "image": "images/freshservice-dry-jersey.jpg", "evidence": "初期リスト（ユーザー提供）より：公式の乾燥機可否は未確認"}, {"id": "arcteryx-cormac", "category": "ロンT", "brand": "Arc'teryx", "name": "コーマック クルー ロングスリーブ", "url": "https://arcteryx.jp/products/cormac-crew-ls-m", "price": 15400, "listPrice": null, "fabric": "ポリエステル100%", "status": "ok", "statusDetail": "OK 低温（公式）", "note": "薄手ワッフルでややアウトドア寄り", "image": "images/arcteryx-cormac.jpg", "evidence": "初期リスト（ユーザー提供）より：OK 低温（公式）"}, {"id": "arcteryx-kragg", "category": "ロンT", "brand": "Arc'teryx", "name": "クラッグ コットン ロングスリーブ", "url": "https://arcteryx.jp/products/kragg-cotton-ls-m", "price": 15400, "listPrice": null, "fabric": "綿100%", "status": "ok", "statusDetail": "低温デリケートOK（公式）だがシワが出る", "note": "厚手街着", "image": "images/arcteryx-kragg.jpg", "evidence": "初期リスト（ユーザー提供）より：低温デリケートOK（公式）だがシワが出る"}, {"id": "columbia-lost-brook", "category": "ロンT", "brand": "Columbia", "name": "ロストブルックロングスリーブTシャツ", "url": "https://www.columbiasports.co.jp/shop/g/gPG2062369---XS000/", "price": 6600, "listPrice": null, "fabric": "ポリ60/綿40", "status": "ng", "statusDetail": "洗濯表示で乾燥機不可", "note": "", "image": "images/columbia-lost-brook.jpg", "evidence": "初期リスト（ユーザー提供）より：洗濯表示で乾燥機不可"}, {"id": "mb-wic-ls-t", "category": "ロンT", "brand": "mont-bell", "name": "WIC.ロングスリーブT Men's", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=1114688", "price": 3700, "listPrice": null, "fabric": "ウイックロン®［ポリエステル］", "status": "ok", "statusDetail": "OK 排気80℃まで（公式）", "evidence": "mont-bell公式ページの洗濯表示：「タンブル乾燥処理ができる（排気温度上限80℃）」", "note": "定番の無地ロンT・低価格", "image": "images/mb-wic-ls-t.jpg"}, {"id": "mb-wic-raglan-ls-t", "category": "ロンT", "brand": "mont-bell", "name": "WIC.ラグラン ロングスリーブT Men's", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=1114693", "price": 3900, "listPrice": null, "fabric": "ウイックロン®［ポリエステル］", "status": "ok", "statusDetail": "OK 排気80℃まで（公式）", "evidence": "mont-bell公式ページの洗濯表示：「タンブル乾燥処理ができる（排気温度上限80℃）」", "note": "ラグランスリーブ", "image": "images/mb-wic-raglan-ls-t.jpg"}, {"id": "mb-wic-t", "category": "半袖T", "brand": "mont-bell", "name": "WIC.T Men's", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=1114686", "price": 3100, "listPrice": null, "fabric": "ウイックロン®［ポリエステル］", "status": "ok", "statusDetail": "OK 排気80℃まで（公式）", "evidence": "mont-bell公式ページの洗濯表示：「タンブル乾燥処理ができる（排気温度上限80℃）」", "note": "定番の無地T", "image": "images/mb-wic-t.jpg"}, {"id": "mb-wic-border-t", "category": "半袖T", "brand": "mont-bell", "name": "WIC.ボーダーT Men's", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=1104816", "price": 4500, "listPrice": null, "fabric": "ウイックロン®［ポリエステル］", "status": "ok", "statusDetail": "OK 排気80℃まで（公式）", "evidence": "mont-bell公式ページの洗濯表示：「タンブル乾燥処理ができる（排気温度上限80℃）」", "note": "ボーダー柄・ロンT版の半袖", "image": "images/mb-wic-border-t.jpg"}, {"id": "mb-wic-cardigan", "category": "ニット", "brand": "mont-bell", "name": "WIC.カーディガン Men's", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=1114683", "price": 5500, "listPrice": null, "fabric": "ウイックロン®［ポリエステル］", "status": "ok", "statusDetail": "OK 排気80℃まで（公式）", "evidence": "mont-bell公式ページの洗濯表示：「タンブル乾燥処理ができる（排気温度上限80℃）」", "note": "速乾素材のカーディガン", "image": "images/mb-wic-cardigan.jpg"}, {"id": "mb-wic-drytouch-ls", "category": "シャツ", "brand": "mont-bell", "name": "WIC.ドライタッチ ロングスリーブシャツ Men's", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=1114547", "price": 6600, "listPrice": null, "fabric": "ウイックロン®ドライタッチ［ポリエステル］", "status": "ok", "statusDetail": "OK 排気80℃まで（公式）", "evidence": "mont-bell公式ページの洗濯表示：「タンブル乾燥処理ができる（排気温度上限80℃）」", "note": "長袖シャツ", "image": "images/mb-wic-drytouch-ls.jpg"}, {"id": "mb-wic-drytouch-ss", "category": "シャツ", "brand": "mont-bell", "name": "WIC.ドライタッチ ショートスリーブシャツ Men's", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=1114549", "price": 6000, "listPrice": null, "fabric": "ウイックロン®ドライタッチ［ポリエステル］", "status": "ok", "statusDetail": "OK 排気80℃まで（公式）", "evidence": "mont-bell公式ページの洗濯表示：「タンブル乾燥処理ができる（排気温度上限80℃）」", "note": "半袖シャツ", "image": "images/mb-wic-drytouch-ss.jpg"}, {"id": "mb-wic-light-pocket-ls", "category": "シャツ", "brand": "mont-bell", "name": "WIC.ライト シングルポケット ロングスリーブシャツ Men's", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=1114834", "price": 6900, "listPrice": null, "fabric": "ウイックロン®［ポリエステル］", "status": "ok", "statusDetail": "OK 排気80℃まで（公式）", "evidence": "mont-bell公式ページの洗濯表示：「タンブル乾燥処理ができる（排気温度上限80℃）」", "note": "薄手・胸ポケット1つ", "image": "images/mb-wic-light-pocket-ls.jpg"}, {"id": "mb-wic-ls-polo", "category": "シャツ", "brand": "mont-bell", "name": "WIC.ロングスリーブ ポロシャツ Men's", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=1114230", "price": 6600, "listPrice": null, "fabric": "ウイックロン®［ポリエステル］", "status": "ok", "statusDetail": "OK 排気80℃まで（公式）", "evidence": "mont-bell公式ページの洗濯表示：「タンブル乾燥処理ができる（排気温度上限80℃）」", "note": "長袖ポロ", "image": "images/mb-wic-ls-polo.jpg"}, {"id": "mb-corespun-travel-pants", "category": "パンツ", "brand": "mont-bell", "name": "コアスパン トラベルパンツ Men's", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=2105281", "price": 9900, "listPrice": null, "fabric": "コアスパン［コットン55%＋ポリエステル43%＋ポリウレタン2%］", "status": "ok", "statusDetail": "低温OK 排気60℃まで（公式）", "evidence": "mont-bell公式ページの洗濯表示：「低い温度でのタンブル乾燥処理ができる（排気温度上限60℃）」", "note": "トラベル向けパンツ", "image": "images/mb-corespun-travel-pants.jpg"}, {"id": "mb-climaplus100-jkt", "category": "アウター・フリース", "brand": "mont-bell", "name": "クリマプラス100 ジャケット Men's", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=1106591", "price": 8400, "listPrice": null, "fabric": "クリマプラス® 100［ポリエステル］", "status": "ok", "statusDetail": "低温OK 排気60℃まで（公式）", "evidence": "mont-bell公式ページの洗濯表示：「低い温度でのタンブル乾燥処理ができる（排気温度上限60℃）」", "note": "定番フリースジャケット", "image": "images/mb-climaplus100-jkt.jpg"}, {"id": "mb-climatweed-jkt", "category": "アウター・フリース", "brand": "mont-bell", "name": "クリマツイード ジャケット Men's", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=1106797", "price": 9100, "listPrice": null, "fabric": "クリマツイード™［ポリエステル］", "status": "ok", "statusDetail": "低温OK 排気60℃まで（公式）", "evidence": "mont-bell公式ページの洗濯表示：「低い温度でのタンブル乾燥処理ができる（排気温度上限60℃）」", "note": "ツイード調フリース", "image": "images/mb-climatweed-jkt.jpg"}, {"id": "mb-chameece-cardigan", "category": "アウター・フリース", "brand": "mont-bell", "name": "シャミース カーディガン Men's", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=1114665", "price": 6400, "listPrice": null, "fabric": "シャミース™［ポリエステル］", "status": "ok", "statusDetail": "低温OK 排気60℃まで（公式）", "evidence": "mont-bell公式ページの洗濯表示：「低い温度でのタンブル乾燥処理ができる（排気温度上限60℃）」", "note": "フリース素材のカーディガン", "image": "images/mb-chameece-cardigan.jpg"}, {"id": "mb-cool-parka", "category": "スウェット・パーカー", "brand": "mont-bell", "name": "クール パーカ Men's", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=1114636", "price": 7500, "listPrice": null, "fabric": "ポリエステル100%［はっ水加工］", "status": "ok", "statusDetail": "OK 排気80℃まで（公式）", "evidence": "mont-bell公式ページの洗濯表示：「タンブル乾燥処理ができる（排気温度上限80℃）」", "note": "薄手パーカ", "image": "images/mb-cool-parka.jpg"}, {"id": "mb-od-pants-light", "category": "パンツ", "brand": "mont-bell", "name": "O.D.パンツ ライト Men's", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=1105661", "price": 8900, "listPrice": null, "fabric": "ナイロン94%＋ポリウレタン6%・リップストップ（はっ水加工）", "status": "ng", "statusDetail": "タンブル乾燥禁止（公式）", "evidence": "mont-bell公式ページの洗濯表示：「タンブル乾燥禁止」", "note": "ナイロンでもNGの例", "image": "images/mb-od-pants-light.jpg"}, {"id": "mb-wic-od-shirt", "category": "シャツ", "brand": "mont-bell", "name": "WIC.O.D.シャツ Men's", "url": "https://webshop.montbell.jp/goods/disp.php?product_id=1114332", "price": 7920, "listPrice": null, "fabric": "ウイックロン®［ポリエステル］", "status": "ng", "statusDetail": "タンブル乾燥禁止（公式）", "evidence": "mont-bell公式ページの洗濯表示：「タンブル乾燥禁止」", "note": "同じウイックロンでもNGの例", "image": "images/mb-wic-od-shirt.jpg"}, {"id": "uq-super-non-iron-stretch-bd", "category": "シャツ", "brand": "UNIQLO", "name": "スーパーノンアイロンストレッチシャツ/ボタンダウン", "url": "https://www.uniqlo.com/jp/ja/products/E470202-000/00", "price": 2990, "listPrice": null, "fabric": "ポリエステル51%, 綿49%", "status": "ok", "statusDetail": "乾燥機可（公式）", "evidence": "UNIQLO公式商品情報の取扱い：「洗濯機可・ネット使用, ドライクリーニング可, 乾燥機可」", "note": "ノンアイロン・ストレッチ", "image": "images/uq-super-non-iron-stretch-bd.jpg"}, {"id": "uq-kando-pants", "category": "パンツ", "brand": "UNIQLO", "name": "感動パンツ", "url": "https://www.uniqlo.com/jp/ja/products/E447780-000/00", "price": 3990, "listPrice": null, "fabric": "ポリエステル（組成は公式に複数パターン記載）", "status": "ng", "statusDetail": "乾燥機不可（公式）", "evidence": "UNIQLO公式商品情報の取扱い：「洗濯機可・ネット使用, ドライクリーニング不可, 乾燥機不可」", "note": "イージーケアだが乾燥機NG", "image": "images/uq-kando-pants.jpg"}, {"id": "uq-airism-cotton-crew", "category": "半袖T", "brand": "UNIQLO", "name": "エアリズムコットンクルーネックT", "url": "https://www.uniqlo.com/jp/ja/products/E482522-000/00", "price": 1290, "listPrice": null, "fabric": "綿61%, 複合繊維（ポリエステル）33%, ポリウレタン6%", "status": "ng", "statusDetail": "乾燥機不可（公式）", "evidence": "UNIQLO公式商品情報の取扱い：「洗濯機可・ネット使用, ドライクリーニング不可, 乾燥機不可」", "note": "人気定番Tだが乾燥機NG", "image": "images/uq-airism-cotton-crew.jpg"}, {"id": "on-core-long-t", "category": "ロンT", "brand": "On", "name": "Core Long-T", "url": "https://www.on.com/ja-jp/products/core-long-t-m-1me1075", "price": 9350, "listPrice": null, "fabric": "ポリエステル92%, エラスタン8%", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "On公式「お手入れ方法」：「低温でタンブラー乾燥可」", "note": "ベーシックな長袖・レギュラーフィット", "image": "images/on-core-long-t.jpg"}, {"id": "on-core-t", "category": "半袖T", "brand": "On", "name": "Core-T", "url": "https://www.on.com/ja-jp/products/core-t-m-1me1043", "price": 7700, "listPrice": null, "fabric": "ポリエステル92%, エラスタン8%", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "On公式「お手入れ方法」：「低温でタンブラー乾燥可」", "note": "ベーシックな半袖", "image": "images/on-core-t.jpg"}, {"id": "on-club-collective-t", "category": "半袖T", "brand": "On", "name": "Club Collective-T", "url": "https://www.on.com/ja-jp/products/club-collective-t-m-1mg1071", "price": 7700, "listPrice": null, "fabric": "綿100%", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "On公式「お手入れ方法」：「低温でタンブラー乾燥可」「裏返して洗濯」", "note": "コットンの街着T", "image": "images/on-club-collective-t.jpg"}, {"id": "on-trek-pants", "category": "パンツ", "brand": "On", "name": "Trek Pants", "url": "https://www.on.com/ja-jp/products/trek-pants-m-1mf3010", "price": 17600, "listPrice": null, "fabric": "ポリアミド94%, エラスタン6%", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "On公式「お手入れ方法」：「低温でタンブラー乾燥可」", "note": "ストレッチナイロンパンツ", "image": "images/on-trek-pants.jpg"}, {"id": "on-core-pants", "category": "パンツ", "brand": "On", "name": "Core Pants", "url": "https://www.on.com/ja-jp/products/core-pants-1mf1011", "price": 16500, "listPrice": null, "fabric": "ポリエステル100%（メッシュ部 ポリエステル94%/エラスタン6%）", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "On公式「お手入れ方法」：「低温でタンブラー乾燥可」", "note": "ランニング系パンツ", "image": "images/on-core-pants.jpg"}, {"id": "on-climate-zip-hoodie", "category": "スウェット・パーカー", "brand": "On", "name": "Climate Zip Hoodie", "url": "https://www.on.com/ja-jp/products/climate-zip-hoodie-m-1mg3069", "price": 17600, "listPrice": null, "fabric": "ポリエステル94%, エラスタン6%", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "On公式「お手入れ方法」：「低温でタンブラー乾燥可」", "note": "ジップパーカー", "image": "images/on-climate-zip-hoodie.jpg"}, {"id": "on-core-jacket", "category": "アウター・フリース", "brand": "On", "name": "Core Jacket", "url": "https://www.on.com/ja-jp/products/core-jacket-m-1me1033", "price": 26400, "listPrice": null, "fabric": "ポリアミド87%, エラスタン13%（下部 ポリアミド92%/エラスタン8%）", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "On公式「お手入れ方法」：「低温でタンブラー乾燥可」", "note": "軽量ジャケット", "image": "images/on-core-jacket.jpg"}, {"id": "on-all-day-track-jacket", "category": "アウター・フリース", "brand": "On", "name": "All-Day Track Jacket", "url": "https://www.on.com/ja-jp/products/all-day-track-jacket-m-1mg3096", "price": 26400, "listPrice": null, "fabric": "ポリアミド100%（メッシュ ポリエステル100%）", "status": "ng", "statusDetail": "タンブラー乾燥不可（公式）", "evidence": "On公式「お手入れ方法」：「タンブラー乾燥不可」", "note": "街着向けトラックジャケットだがNG", "image": "images/on-all-day-track-jacket.jpg"}, {"id": "on-club-hoodie", "category": "スウェット・パーカー", "brand": "On", "name": "Club Hoodie", "url": "https://www.on.com/ja-jp/products/club-hoodie-1me1003", "price": 17600, "listPrice": null, "fabric": "綿68%, ポリエステル32%", "status": "unknown", "statusDetail": "公式表記が矛盾", "evidence": "On公式「お手入れ方法」に「タンブラー乾燥不可」と「低温でタンブラー乾燥可」が併記されており判断不可", "note": "スウェットフーディ", "image": "images/on-club-hoodie.jpg"}, {"id": "sal-shakeout-core-ls", "category": "ロンT", "brand": "Salomon", "name": "SHAKEout CORE 男性用長袖Tシャツ", "url": "https://salomon.jp/products/shakeout-core-lc29479", "price": 6600, "listPrice": null, "fabric": "ポリエステル100%", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "サロモン公式「Care」：「低温でのタンブル乾燥可能」", "note": "Knit_Flow素材・ランニング寄り", "image": "images/sal-shakeout-core-ls.jpg"}, {"id": "sal-essential-lightwarm-crew", "category": "アウター・フリース", "brand": "Salomon", "name": "ESSENTIAL LIGHTWARM 男性用クルーネックプルオーバー", "url": "https://salomon.jp/products/essential-lightwarm-lc30512", "price": 8800, "listPrice": null, "fabric": "ポリエステル93%, ポリウレタン7%", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "サロモン公式「Care」：「低温でのタンブル乾燥可能」", "note": "フリースのクルーネック", "image": "images/sal-essential-lightwarm-crew.jpg"}, {"id": "sal-motomesh-crew", "category": "アウター・フリース", "brand": "Salomon", "name": "MOTOMESH 男性用クルーネックプルオーバー", "url": "https://salomon.jp/products/motomesh-lc28466", "price": 9900, "listPrice": 11000, "fabric": "ポリエステル100%", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "サロモン公式「Care」：「タンブラー乾燥（低温）」", "note": "街でも山でも着られるフリース", "image": "images/sal-motomesh-crew.jpg"}, {"id": "sal-thernova-hoodie", "category": "スウェット・パーカー", "brand": "Salomon", "name": "THERNOVA 男性用スウェットシャツ（フード付）", "url": "https://salomon.jp/products/thernova-lc29667", "price": 17600, "listPrice": null, "fabric": "ポリエステル100%", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "サロモン公式「Care」：「低温でのタンブル乾燥可能」「すぐに取り出してください」", "note": "フリースフーディ", "image": "images/sal-thernova-hoodie.jpg"}, {"id": "sal-wayfarer-warm-pants", "category": "パンツ", "brand": "Salomon", "name": "WAYFARER WARM 男性用パンツ", "url": "https://salomon.jp/products/wayfarer-warm-lc26163", "price": 11550, "listPrice": 16500, "fabric": "ナイロン92%, ポリウレタン8%", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "サロモン公式「Care」：「タンブラー乾燥（低温）」", "note": "保温性のあるパンツ", "image": "images/sal-wayfarer-warm-pants.jpg"}, {"id": "sal-trackline-ls", "category": "ロンT", "brand": "Salomon", "name": "TRACKLINE 男性用長袖Tシャツ", "url": "https://salomon.jp/products/trackline-lc29546", "price": 6600, "listPrice": null, "fabric": "ポリエステル93%, ポリウレタン7%", "status": "unknown", "statusDetail": "公式は吊り干し指示", "evidence": "サロモン公式「Care」：「吊るして乾燥してください」（タンブル乾燥の可否の明記なし）", "note": "街着向けミニマルデザイン", "image": "images/sal-trackline-ls.jpg"}, {"id": "nn-ooal-poly-jersey-ls", "category": "ロンT", "brand": "nanamica", "name": "OOAL Polyester Jersey Long Sleeve Tee", "url": "https://www.nanamica.com/item/8736/", "price": 19800, "listPrice": null, "fabric": "Recycled Polyester Jersey（ポリエステル100%）", "status": "unknown", "statusDetail": "未確認", "evidence": "nanamica公式ページに洗濯表示の記載なし", "note": "3本針パッカリング縫製", "image": "images/nn-ooal-poly-jersey-ls.jpg"}, {"id": "nn-ooal-poly-jersey-tee", "category": "半袖T", "brand": "nanamica", "name": "OOAL Polyester Jersey Tee", "url": "https://www.nanamica.com/item/8737/", "price": 17600, "listPrice": null, "fabric": "Recycled Polyester Jersey（ポリエステル100%）", "status": "unknown", "statusDetail": "未確認", "evidence": "nanamica公式ページに洗濯表示の記載なし", "note": "ストレッチのあるポリ天竺", "image": "images/nn-ooal-poly-jersey-tee.jpg"}, {"id": "nn-poly-typewriter-shirt", "category": "シャツ", "brand": "nanamica", "name": "Polyester Typewriter Shirt", "url": "https://www.nanamica.com/item/8772/", "price": 31900, "listPrice": null, "fabric": "Recycled Polyester Typewriter（ポリエステル100%）", "status": "unknown", "statusDetail": "未確認", "evidence": "nanamica公式ページに洗濯表示の記載なし", "note": "綿シャツのようなシワ感のポリシャツ", "image": "images/nn-poly-typewriter-shirt.jpg"}, {"id": "nn-alphadry-club-pants", "category": "パンツ", "brand": "nanamica", "name": "ALPHADRY Club Pants", "url": "https://www.nanamica.com/item/8766/", "price": 30800, "listPrice": null, "fabric": "ALPHADRY® Stretch Cloth（ポリエステル76%, エラステレルポリエステル24%）", "status": "unknown", "statusDetail": "未確認", "evidence": "nanamica公式ページに洗濯表示の記載なし", "note": "吸汗速乾・ストレッチ", "image": "images/nn-alphadry-club-pants.jpg"}, {"id": "nn-ooal-poly-pile-parka", "category": "スウェット・パーカー", "brand": "nanamica", "name": "OOAL Polyester Pile Hooded Parka", "url": "https://www.nanamica.com/item/8734/", "price": 34100, "listPrice": null, "fabric": "Recycled Polyester Pile（ポリエステル100%）", "status": "unknown", "statusDetail": "未確認", "evidence": "nanamica公式ページに洗濯表示の記載なし", "note": "ポリ100%の裏毛パーカ", "image": "images/nn-ooal-poly-pile-parka.jpg"}, {"id": "tnf-es-baseball-tee-ls", "category": "ロンT", "brand": "THE NORTH FACE", "name": "ロングスリーブ ES ベースボールティー NT82591", "url": "https://www.goldwin.co.jp/ap/item/i/m/NT82591", "price": 7150, "listPrice": null, "fabric": "FLASHDRY ES Spun Knit（ポリエステル75%, 複合繊維（ポリエステル）25%）", "status": "unknown", "statusDetail": "未確認", "evidence": "ゴールドウイン公式ページに洗濯表示の記載なし", "note": "ラグラン切替のベースボールT", "image": "images/tnf-es-baseball-tee-ls.jpg"}, {"id": "tnf-es-climbing-logo-tee-ls", "category": "ロンT", "brand": "THE NORTH FACE", "name": "ロングスリーブ ES クライミングロゴティー NT82593", "url": "https://www.goldwin.co.jp/ap/item/i/m/NT82593", "price": 5005, "listPrice": 7150, "fabric": "FLASHDRY ES Spun Knit（ポリエステル75%, 複合繊維（ポリエステル）25%）", "status": "unknown", "statusDetail": "未確認", "evidence": "ゴールドウイン公式ページに洗濯表示の記載なし", "note": "アウトレット価格", "image": "images/tnf-es-climbing-logo-tee-ls.jpg"}, {"id": "tnf-novelty-denali-jkt", "category": "アウター・フリース", "brand": "THE NORTH FACE", "name": "ノベルティーデナリジャケット NA72451", "url": "https://www.goldwin.co.jp/ap/item/i/m/NA72451", "price": 16170, "listPrice": 23100, "fabric": "表地 Versa Micro ECO 300（ポリエステル100%）／別布 ナイロン100%", "status": "unknown", "statusDetail": "未確認", "evidence": "ゴールドウイン公式ページに洗濯表示の記載なし", "note": "定番フリースの柄物", "image": "images/tnf-novelty-denali-jkt.jpg"}, {"id": "ur-drymix-ox-ls-shirt", "category": "シャツ", "brand": "URBAN RESEARCH DOORS", "name": "DRYMIX オックス ロングスリーブ シャツ 26AW", "url": "https://www.urban-research.jp/shop/g/gDR26330-1030447/", "price": 6545, "listPrice": 9350, "fabric": "ポリエステル100%", "status": "unknown", "statusDetail": "未確認", "evidence": "公式「洗濯表記」は「洗濯機洗い可, ドライクリーニング」のみ（乾燥機の記載なし）", "note": "吸水速乾・防シワの綿タッチ", "image": "images/ur-drymix-ox-ls-shirt.jpg"}, {"id": "ur-urtech-aircare-ls-shirt", "category": "シャツ", "brand": "URBAN RESEARCH DOORS", "name": "『URTECH』Aircare ロングスリーブシャツ 26AW", "url": "https://www.urban-research.jp/shop/g/gDR26330-1031420/", "price": 7480, "listPrice": 9350, "fabric": "ポリエステル65%, 綿35%", "status": "unknown", "statusDetail": "未確認", "evidence": "公式「洗濯表記」は「洗濯機洗い可, ドライクリーニング」のみ（乾燥機の記載なし）", "note": "速乾・イージーケア・UVカット", "image": "images/ur-urtech-aircare-ls-shirt.jpg"}, {"id": "ur-urtech-summershare-trousers", "category": "パンツ", "brand": "URBAN RESEARCH DOORS", "name": "『UR TECH』サマシェア イージートラウザー", "url": "https://www.urban-research.jp/shop/g/gDR26230-1041112/", "price": 4950, "listPrice": 9900, "fabric": "ポリエステル92%, ポリウレタン8%", "status": "unknown", "statusDetail": "未確認", "evidence": "公式「洗濯表記」は「洗濯機洗い可, ドライクリーニング」のみ（乾燥機の記載なし）", "note": "接触冷感・吸水速乾（春夏物）", "image": "images/ur-urtech-summershare-trousers.jpg"}, {"id": "ur-urtech-summershare-crew-knit", "category": "ニット", "brand": "URBAN RESEARCH DOORS", "name": "『UR TECH』サマシェア クルーネックニット", "url": "https://www.urban-research.jp/shop/g/gDR26230-1022118/", "price": 3520, "listPrice": 8800, "fabric": "綿50%, ポリエステル50%", "status": "unknown", "statusDetail": "未確認", "evidence": "公式「洗濯表記」は「洗濯機洗い可, ドライクリーニング」のみ（乾燥機の記載なし）", "note": "春夏向けニット・大幅値下げ", "image": "images/ur-urtech-summershare-crew-knit.jpg"}, {"id": "sp-dry-waffle-ls", "category": "ロンT", "brand": "Snow Peak", "name": "Dry Waffle Long Sleeve T-Shirt CS-26SU001", "url": "https://ec.snowpeak.co.jp/item/SNP0126A0143", "price": 8470, "listPrice": 12100, "fabric": "ポリエステル100%", "status": "unknown", "statusDetail": "未確認", "evidence": "公式ページに洗濯表示の記載なし（素材は公式ページ記載として検索結果で確認）", "note": "細かいワッフル・ドロップショルダー", "image": "images/sp-dry-waffle-ls.jpg"}, {"id": "descente-at-graphic-ls", "category": "ロンT", "brand": "DESCENTE ALLTERRAIN", "name": "【81】グラフィックロングスリーブTシャツ", "url": "https://store.descente.co.jp/commodity/SDSC0140D/AL7646EM001381/", "price": 11000, "listPrice": null, "fabric": "本体 ポリエステル60%, 複合繊維（ポリエステル）40%", "status": "unknown", "statusDetail": "未確認", "evidence": "デサントストアは洗濯記号を画像で表示（テキストでは未確認）", "note": "吸汗速乾・UPF50+", "image": "images/descente-at-graphic-ls.jpg"}, {"id": "aw-pe-waffle-ls", "category": "ロンT", "brand": "and wander", "name": "PEワッフルロングスリーブT 5745984084", "url": "https://ec.jal.co.jp/shop/g/g0195-a22-714mbk25/", "price": 24200, "listPrice": null, "fabric": "ポリエステル100%（別布 ナイロン100%）", "status": "unknown", "statusDetail": "未確認", "evidence": "正規取扱店（SUNDAY MOUNTAIN）の商品ページ。公式ストアのページは取得できず、洗濯表示も未確認", "note": "カラビナ付きポケット・日本製", "image": "images/aw-pe-waffle-ls.jpg"}, {"id": "arc-cormac-crew-ss", "category": "半袖T", "brand": "Arc'teryx", "name": "コーマック クルー ショートスリーブ メンズ", "url": "https://arcteryx.jp/products/cormac-crew-ss-m", "price": 13200, "listPrice": null, "fabric": "軽量ポリエステル テックTジャージー（Silvadur™仕上げ）110gsm・ポリエステル100%", "status": "ok", "statusDetail": "デリケート・低温OK（公式）", "evidence": "アークテリクス公式（arcteryx.jp）のケア表示：「デリケート設定の低温でタンブル乾燥」", "note": "レギュラーフィット・無地", "image": "images/arc-cormac-crew-ss.jpg"}, {"id": "arc-cormac-logo-ss", "category": "半袖T", "brand": "Arc'teryx", "name": "コーマック ロゴ ショートスリーブ メンズ", "url": "https://arcteryx.jp/products/cormac-logo-ss-m", "price": 14300, "listPrice": null, "fabric": "ポリエステル100%（軽量テックTジャージー、シルバデュール仕上げ）110gsm", "status": "ok", "statusDetail": "デリケート・低温OK（公式）", "evidence": "アークテリクス公式（arcteryx.jp）のケア表示：「デリケート設定の低温でタンブル乾燥」", "note": "胸ロゴ・レギュラーフィット", "image": "images/arc-cormac-logo-ss.jpg"}, {"id": "arc-cormac-hoody", "category": "スウェット・パーカー", "brand": "Arc'teryx", "name": "コーマック フーディ メンズ", "url": "https://arcteryx.jp/products/cormac-hoody-m", "price": 16500, "listPrice": null, "fabric": "リサイクルポリエステル Solotex サーキュラーニットワッフル 110gsm（ポリエステル）", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "アークテリクス公式（arcteryx.jp）のケア表示：「低温でタンブル乾燥」", "note": "薄手ワッフルのフーディ", "image": "images/arc-cormac-hoody.jpg"}, {"id": "arc-skyline-ls-shirt", "category": "シャツ", "brand": "Arc'teryx", "name": "スカイライン ロングスリーブ シャツ メンズ", "url": "https://arcteryx.jp/products/skyline-ls-shirt-m", "price": 19800, "listPrice": null, "fabric": "Diem™ 60デニール リサイクルポリエステル平織 76gsm・ポリエステル100%", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "アークテリクス公式（arcteryx.jp）のケア表示：「低温でタンブル乾燥」", "note": "レギュラーフィットの長袖シャツ", "image": "images/arc-skyline-ls-shirt.jpg"}, {"id": "arc-frame-ls-shirt", "category": "シャツ", "brand": "Arc'teryx Veilance", "name": "フレーム ロングスリーブ シャツ メンズ", "url": "https://arcteryx.jp/products/frame-ls-shirt-m", "price": 34100, "listPrice": null, "fabric": "極細メリノウール＋ナイロンコア（混率の記載なし／タグ「ウール混」）", "status": "ok", "statusDetail": "デリケート・低温OK（公式）", "evidence": "アークテリクス公式（arcteryx.jp）のケア表示：「デリケート設定の低温でタンブル乾燥」", "note": "Veilanceのシャツ。メリノ混でもタンブル可", "image": "images/arc-frame-ls-shirt.jpg"}, {"id": "arc-ossa-overshirt", "category": "シャツ", "brand": "Arc'teryx", "name": "オッサ オーバーシャツ メンズ", "url": "https://arcteryx.jp/products/ossa-overshirt-m", "price": 28600, "listPrice": null, "fabric": "30デニール リサイクルナイロン ストレッチ リップストップ 62gsm（ナイロン87%・ポリウレタン13%）", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "アークテリクス公式（arcteryx.jp）のケア表示：「低温でタンブル乾燥」", "note": "リラックスフィットのオーバーシャツ", "image": "images/arc-ossa-overshirt.jpg"}, {"id": "arc-gamma-quick-dry-pant", "category": "パンツ", "brand": "Arc'teryx", "name": "ガンマ クイックドライ パンツ メンズ", "url": "https://arcteryx.jp/products/gamma-quick-dry-pant-m", "price": 29700, "listPrice": null, "fabric": "TerraTex™ ナイロン/スパンデックス平織 123gsm（ナイロン94%・ポリウレタン6%）", "status": "ok", "statusDetail": "弱回転・低温OK（公式）", "evidence": "アークテリクス公式（arcteryx.jp）のケア表示：「弱回転の低温でタンブル乾燥」", "note": "トリムフィット", "image": "images/arc-gamma-quick-dry-pant.jpg"}, {"id": "arc-gamma-pant", "category": "パンツ", "brand": "Arc'teryx", "name": "ガンマ パンツ メンズ", "url": "https://arcteryx.jp/products/gamma-pant-m", "price": 33000, "listPrice": null, "fabric": "Fortius™ DW 2.0 ウーブン二重織 186gsm（ナイロン88%・ポリウレタン12%）", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "アークテリクス公式（arcteryx.jp）のケア表示：「低温でタンブル乾燥」", "note": "レギュラーフィット", "image": "images/arc-gamma-pant.jpg"}, {"id": "arc-gamma-jogger", "category": "パンツ", "brand": "Arc'teryx", "name": "ガンマ ジョガー メンズ", "url": "https://arcteryx.jp/products/gamma-jogger-m", "price": 34100, "listPrice": null, "fabric": "リサイクルナイロン二重織 186gsm（ナイロン88%・ポリウレタン12%）", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "アークテリクス公式（arcteryx.jp）のケア表示：「低温でタンブル乾燥」", "note": "裾リブのジョガー", "image": "images/arc-gamma-jogger.jpg"}, {"id": "pat-daily-pocket-tee", "category": "半袖T", "brand": "Patagonia", "name": "メンズ・デイリー・ポケット・ティー", "url": "https://www.patagonia.jp/product/mens-daily-pocket-tee/37878.html", "price": 8800, "listPrice": null, "fabric": "コットン・イン・コンバージョン100%（4.7オンス・ジャージー）", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "パタゴニア公式「素材／お手入れ方法」：「最高液温40℃で洗濯、漂白剤不可、乾燥機 低温、アイロン 中温」", "note": "綿100%だが公式で乾燥機低温可。縮みに注意", "image": "images/pat-daily-pocket-tee.jpg"}, {"id": "pat-essential-polo", "category": "半袖T", "brand": "Patagonia", "name": "メンズ・エッセンシャル・ポロ", "url": "https://www.patagonia.jp/product/mens-essential-polo-shirt/42215.html", "price": 11000, "listPrice": null, "fabric": "オーガニックコットン65%／リサイクル・ポリエステル35%（4.5オンス・ジャージー）", "status": "ok", "statusDetail": "低温OK（公式）", "evidence": "パタゴニア公式「素材／お手入れ方法」：「常温洗濯可 低速回転、漂白剤不可、乾燥機 低温、アイロン 低温」", "note": "半袖ポロ", "image": "images/pat-essential-polo.jpg"}, {"id": "pat-cap-cool-merino-ls", "category": "ロンT", "brand": "Patagonia", "name": "メンズ・ロングスリーブ・キャプリーン・クール・メリノ・ブレンド・シャツ", "url": "https://www.patagonia.jp/product/mens-long-sleeved-capilene-cool-merino-blend-shirt/44550.html", "price": 11000, "listPrice": null, "fabric": "RWS認証ウール65%／リサイクル・ポリエステル35%（3.5オンス・ジャージー）", "status": "unknown", "statusDetail": "平干し指示（乾燥機の記載なし）", "evidence": "パタゴニア公式「お手入れ方法」：「常温洗濯可 低速回転、漂白剤不可、平干し、アイロン仕上げ禁止」。乾燥機の可否は記載なし", "note": "メリノ×ポリのロンT", "image": "images/pat-cap-cool-merino-ls.jpg"}, {"id": "beams-pilgrim-quickdry-ls", "category": "ロンT", "brand": "Pilgrim Surf+Supply（BEAMS）", "name": "Pilgrim Surf+Supply QUICK DRY Long Sleeve Tee", "url": "https://www.beams.co.jp/item/pilgrimsurfsupply/t-shirt/36140195657/", "price": 9350, "listPrice": null, "fabric": "ポリエステル100%（機能性天竺）", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「水洗い・ウェットクリーニング可（クリーニング店での水洗い）」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "レギュラーフィット・速乾", "image": "images/beams-pilgrim-quickdry-ls.jpg"}, {"id": "beams-pilgrim-quickdry-tee", "category": "半袖T", "brand": "Pilgrim Surf+Supply（BEAMS）", "name": "Pilgrim Surf+Supply Quick Dry Tee", "url": "https://www.beams.co.jp/item/pilgrimsurfsupply/t-shirt/36040087657/", "price": 7700, "listPrice": null, "fabric": "ポリエステル100%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「水洗い可」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "ドライタッチの半袖T", "image": "images/beams-pilgrim-quickdry-tee.jpg"}, {"id": "beams-heart-ponte-crew", "category": "ロンT", "brand": "BEAMS HEART", "name": "BEAMS HEART ラグジュアリーポンチ クルーネック カットソー", "url": "https://www.beams.co.jp/item/beamsheart/t-shirt/41140016458/", "price": 9900, "listPrice": null, "fabric": "本体：コットン60% ポリエステル40%／リブ部分：コットン100%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「洗濯可」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "スーピマ綿×ポリのシルケット素材", "image": "images/beams-heart-ponte-crew.jpg"}, {"id": "beams-heart-waffle-ls", "category": "ロンT", "brand": "BEAMS HEART", "name": "ワッフル ロングスリーブ カットソー（吸水速乾・毛玉軽減）", "url": "https://www.beams.co.jp/item/beamsheart/t-shirt/42140282639/", "price": 6050, "listPrice": null, "fabric": "本体：ポリエステル100%／襟：ポリエステル85% ナイロン14% ポリウレタン1%／別布：ポリエステル50% コットン42% ポリウレタン8%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「洗濯可」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "ポリのワッフル・クイックドライ＆アンチピリング", "image": "images/beams-heart-waffle-ls.jpg"}, {"id": "beams-pilgrim-thermal-crew", "category": "ロンT", "brand": "Pilgrim Surf+Supply（BEAMS）", "name": "Pilgrim Surf+Supply Quick Dry Thermal Crew", "url": "https://www.beams.co.jp/item/pilgrimsurfsupply/t-shirt/36140269657/", "price": 14300, "listPrice": null, "fabric": "ポリエステル100%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページにケア方法・乾燥機（タンブル乾燥）の記載なし（詳細は品質表示ラベル参照）", "note": "コットンのような風合いのポリ100%サーマル・レギュラーフィット", "image": "images/beams-pilgrim-thermal-crew.jpg"}, {"id": "beams-pilgrim-stanley-ls", "category": "ロンT", "brand": "Pilgrim Surf+Supply（BEAMS）", "name": "Pilgrim Surf+Supply Stanley Quick Dry Long Sleeve Tee", "url": "https://www.beams.co.jp/item/pilgrimsurfsupply/t-shirt/36140278657/", "price": 9900, "listPrice": null, "fabric": "ポリエステル100%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページにケア方法・乾燥機（タンブル乾燥）の記載なし（詳細は品質表示ラベル参照）", "note": "レイヤードポケット付き・さらりとした速乾ロンT", "image": "images/beams-pilgrim-stanley-ls.jpg"}, {"id": "beams-pinhole-ls", "category": "ロンT", "brand": "BEAMS", "name": "ピンホール ロングスリーブ Tシャツ", "url": "https://www.beams.co.jp/item/beams/t-shirt/11141237033/", "price": 6930, "listPrice": 9900, "fabric": "本体：コットン78% ポリエステル22%／リブ：コットン70% ポリエステル30%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「水洗い・ドライクリーニング両方可」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "裏ポリのプレーティング天竺・ワイドフィット（綿主体）・10/15値下げ", "image": "images/beams-pinhole-ls.jpg"}, {"id": "beams-technical-tee", "category": "半袖T", "brand": "BEAMS", "name": "Technical T-Shirt (吸水速乾)", "url": "https://www.beams.co.jp/item/beams/t-shirt/11041337458/", "price": 13200, "listPrice": null, "fabric": "ポリエステル100%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「水洗い・ドライクリーニング両方可」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "コットンライクな化繊・2WAYストレッチ・日本製・ワイドフィット", "image": "images/beams-technical-tee.jpg"}, {"id": "beams-heart-cottonlike-poly-tee", "category": "半袖T", "brand": "BEAMS HEART", "name": "綿ライク ポリエステル ショートスリーブ Tシャツ（吸水速乾・UVカット）", "url": "https://www.beams.co.jp/item/beamsheart/t-shirt/42040400639/", "price": 4950, "listPrice": null, "fabric": "本体：ポリエステル100%／リブ：ポリエステル98% ポリウレタン2%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「水洗い・ドライクリーニング両方可」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "コットン風のポリ100%・抗ピリング・UVカット", "image": "images/beams-heart-cottonlike-poly-tee.jpg"}, {"id": "beams-heart-logo-tee", "category": "半袖T", "brand": "BEAMS HEART", "name": "BEAMS HEART ロゴ ショートスリーブ カットソー（吸水速乾・毛玉軽減）", "url": "https://www.beams.co.jp/item/beamsheart/t-shirt/42080070639/", "price": 4180, "listPrice": null, "fabric": "本体：ポリエステル100%／リブ：ポリエステル100%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページにケア方法・乾燥機（タンブル乾燥）の記載なし（詳細は品質表示ラベル参照）", "note": "胸ロゴ・ポリ天竺・低価格", "image": "images/beams-heart-logo-tee.jpg"}, {"id": "beams-heart-danboru-stitch-tee", "category": "半袖T", "brand": "BEAMS HEART", "name": "ダンボール ステッチ Tシャツ（吸水速乾）", "url": "https://www.beams.co.jp/item/beamsheart/t-shirt/42040404639/", "price": 4950, "listPrice": null, "fabric": "ポリエステル52% コットン44% ポリウレタン4%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「水洗い可」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "ハリのあるダンボール素材・配色ステッチ", "image": "images/beams-heart-danboru-stitch-tee.jpg"}, {"id": "beams-heart-twill-easycare-bd", "category": "シャツ", "brand": "BEAMS HEART", "name": "ツイル イージーケア ボタンダウンシャツ", "url": "https://www.beams.co.jp/item/beamsheart/shirt/41110090900/", "price": 8250, "listPrice": null, "fabric": "ポリエステル100%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「洗濯可」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "干すだけでシワが伸びるノーアイロン仕様・ストレッチ", "image": "images/beams-heart-twill-easycare-bd.jpg"}, {"id": "beams-heart-tricot-easycare-bd", "category": "シャツ", "brand": "BEAMS HEART", "name": "トリコット イージーケア ボタンダウンシャツ", "url": "https://www.beams.co.jp/item/beamsheart/shirt/41110089900/", "price": 8250, "listPrice": null, "fabric": "ポリエステル100%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「洗濯可」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "ニット組織のトリコット・速乾・シワ残り少", "image": "images/beams-heart-tricot-easycare-bd.jpg"}, {"id": "beams-heart-light-ponte-shirt", "category": "シャツ", "brand": "BEAMS HEART", "name": "ライトポンチ ジャージ ソリッド シャツ", "url": "https://www.beams.co.jp/item/beamsheart/shirt/41110096458/", "price": 9680, "listPrice": null, "fabric": "ポリエステル75% コットン20% ポリウレタン5%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「水洗い・ドライクリーニング両方可」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "Tシャツのような着心地のジャージーシャツ・イージーケア", "image": "images/beams-heart-light-ponte-shirt.jpg"}, {"id": "beams-plus-bd-ss-coolmax", "category": "シャツ", "brand": "BEAMS PLUS", "name": "B.D. Short Sleeve Oxford COOLMAX (R)", "url": "https://www.beams.co.jp/item/beamsplus/shirt/38010033139/", "price": 13200, "listPrice": null, "fabric": "ポリエステル60% コットン40% または ポリエステル61% コットン39%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「水洗い可」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "COOLMAX混オックスフォードの半袖BD・日本製", "image": "images/beams-plus-bd-ss-coolmax.jpg"}, {"id": "beams-plus-adventure-shirt-nylon", "category": "シャツ", "brand": "BEAMS PLUS", "name": "Adventure Shirt V Ripstop Nylon", "url": "https://www.beams.co.jp/item/beamsplus/shirt/38112046791/", "price": 39600, "listPrice": null, "fabric": "ナイロン86% ポリエステル14%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「水洗い・ドライクリーニング・ウェットクリーニング可（クリーニング店での水洗い）」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "小松マテーレのリップストップ・軽アウター的にも", "image": "images/beams-plus-adventure-shirt-nylon.jpg"}, {"id": "beams-heart-pinhead-travel-slacks", "category": "パンツ", "brand": "BEAMS HEART", "name": "ピンヘッド トラベル スラックス（セットアップ対応）", "url": "https://www.beams.co.jp/item/beamsheart/pants/41230291375/", "price": 13200, "listPrice": null, "fabric": "表地：ポリエステル100%／膝裏地：ポリエステル100%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「水洗い可」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "ウォッシャブル・ストレッチ・同素材ジャケット/ジレあり", "image": "images/beams-heart-pinhead-travel-slacks.jpg"}, {"id": "beams-heart-fieldsensor-slacks", "category": "パンツ", "brand": "BEAMS HEART", "name": "フィールドセンサー スラックス（セットアップ対応・吸水速乾・抗菌防臭）", "url": "https://www.beams.co.jp/item/beamsheart/pants/41230279803/", "price": 9680, "listPrice": 12100, "fabric": "ポリエステル100%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「水洗い・ドライクリーニング両方可」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "機能ジャージー・イージーウエスト・セール", "image": "images/beams-heart-fieldsensor-slacks.jpg"}, {"id": "beams-heart-polytro-easy-pants", "category": "パンツ", "brand": "BEAMS HEART", "name": "ポリトロ テーパード イージーパンツ（吸水速乾）", "url": "https://www.beams.co.jp/item/beamsheart/pants/42230041639/", "price": 3740, "listPrice": 7480, "fabric": "ポリエステル100%（COOLMAX®糸使用）", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「水洗い・ドライクリーニング両方可」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "アウトレット品・サイズ/色により在庫なしあり", "image": "images/beams-heart-polytro-easy-pants.jpg"}, {"id": "beams-heart-hg-ponte-slacks", "category": "パンツ", "brand": "BEAMS HEART", "name": "ハイゲージ ポンチ スラックス（セットアップ対応）", "url": "https://www.beams.co.jp/item/beamsheart/pants/41230280375/", "price": 13200, "listPrice": 16500, "fabric": "コットン57% ナイロン38% ポリウレタン5%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページにケア方法・乾燥機（タンブル乾燥）の記載なし（詳細は品質表示ラベル参照）。説明文に「ご自宅での水洗いも可能」「イージーケア」とあり", "note": "尾州産ジャージポンチ・綿主体・セール", "image": "images/beams-heart-hg-ponte-slacks.jpg"}, {"id": "beams-plus-2pleats-pe-twill", "category": "パンツ", "brand": "BEAMS PLUS", "name": "2 Pleats Trousers PE Twill", "url": "https://www.beams.co.jp/item/beamsplus/pants/38230094791/", "price": 17600, "listPrice": null, "fabric": "ポリエステル100%（小松マテーレ）", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページにケア方法・乾燥機（タンブル乾燥）の記載なし（詳細は品質表示ラベル参照）", "note": "コットンライクなポリ綾・ストレッチ・2プリーツワイド", "image": "images/beams-plus-2pleats-pe-twill.jpg"}, {"id": "beams-heart-pinhead-travel-jacket", "category": "アウター・フリース", "brand": "BEAMS HEART", "name": "ピンヘッド トラベル 2ボタン ジャケット（セットアップ対応）", "url": "https://www.beams.co.jp/item/beamsheart/jacket/41160316375/", "price": 25300, "listPrice": null, "fabric": "表地：ポリエステル100%／裏地：ポリエステル100%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「水洗い可」と記載。乾燥機（タンブル乾燥）の可否は記載なし（説明文に「ご家庭での手洗いが可能」）", "note": "トラベルスラックスとセットアップ可・テーラード", "image": "images/beams-heart-pinhead-travel-jacket.jpg"}, {"id": "beams-heart-heart-star-sweat", "category": "スウェット・パーカー", "brand": "BEAMS HEART", "name": "ハート スター ワンポイント スウェット", "url": "https://www.beams.co.jp/item/beamsheart/tops/42130138639/", "price": 6600, "listPrice": null, "fabric": "本体：コットン57% ポリエステル43%／リブ：コットン57% ポリエステル41% ポリウレタン2%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページにケア方法・乾燥機（タンブル乾燥）の記載なし（詳細は品質表示ラベル参照）", "note": "綿ポリ裏毛のクルーネック・刺繍ワンポイント", "image": "images/beams-heart-heart-star-sweat.jpg"}, {"id": "beams-heart-logo-jacquard-knit", "category": "ニット", "brand": "BEAMS HEART", "name": "ロゴ ジャカード プルオーバー ニット", "url": "https://www.beams.co.jp/item/beamsheart/tops/42150108639/", "price": 8250, "listPrice": null, "fabric": "ポリエステル89% ポリウレタン4% アクリル3% ナイロン2% 毛2%", "status": "unknown", "statusDetail": "公式に乾燥機の記載なし", "evidence": "BEAMS公式の商品ページ：ケア方法「水洗い・ドライクリーニング両方可」と記載。乾燥機（タンブル乾燥）の可否は記載なし", "note": "ポリ主体のメランジ編地・クルーネック", "image": "images/beams-heart-logo-jacquard-knit.jpg"}, {"id": "nanga-ecohbd-emb-ls", "category": "ロンT", "brand": "NANGA", "name": "エコハイブリッド ボックスロゴ エンブロイダリー ロングスリーブTEE（FREAK'S STORE限定展開）", "url": "https://www.daytona-park.com/item/1220328800001", "price": 7700, "listPrice": null, "fabric": "本体：ポリエステル50％ 綿47％ レーヨン3％", "status": "ng", "statusDetail": "タンブル乾燥不可（販売店掲載の洗濯表示）", "note": "胸のボックスロゴ刺繍のみの控えめなクルーネック。バインダーネック系のエコハイブリッド定番", "image": "images/nanga-ecohbd-emb-ls.jpg", "evidence": "Daytona Park（FREAK'S STORE公式通販・NANGA取扱店）商品ページの洗濯表示：「洗濯機洗い可能, 漂白不可, タンブル乾燥不可, 自然乾燥, アイロン仕上げ可能, ドライクリーニング不可, ウエットクリーニング可能」。素材：本体：ポリエステル50％ 綿47％ レーヨン3％。価格は2026-10-18 JST表示。NANGA公式オンラインショップの商品ページには洗濯表示の記載なし。"}, {"id": "nanga-neopro-pocket-ls", "category": "ロンT", "brand": "NANGA", "name": "NANGA × FREAK'S STORE 別注 neo-PRO スピンドル ポケット ロングスリーブTシャツ", "url": "https://www.daytona-park.com/item/1021328800018", "price": 8415, "listPrice": 9900, "fabric": "ポリエステル100％", "status": "ng", "statusDetail": "タンブル乾燥不可（販売店掲載の洗濯表示）", "note": "日本製・吸水速乾・UVカットのポリ100%。バインダーネック、裾ドローコード。タイムセール10/18 23:59まで", "image": "images/nanga-neopro-pocket-ls.jpg", "evidence": "Daytona Park（FREAK'S STORE公式通販・NANGA取扱店）商品ページの洗濯表示：「洗濯機洗い可能, 漂白不可, タンブル乾燥不可, 自然乾燥, アイロン仕上げ可能, ドライクリーニング不可, ウエットクリーニング可能」。素材：ポリエステル100％。価格は2026-10-18 JST表示（タイムセール、参考価格¥9,900）。NANGA公式オンラインショップの商品ページには洗濯表示の記載なし。"}, {"id": "nanga-neopro-backprint-ls", "category": "ロンT", "brand": "NANGA", "name": "NANGA × FREAK'S STORE 別注 neo-PRO スピンドル バックプリント ロングスリーブTシャツ", "url": "https://www.daytona-park.com/item/1021328800019", "price": 8415, "listPrice": 9900, "fabric": "ポリエステル100％", "status": "ng", "statusDetail": "タンブル乾燥不可（販売店掲載の洗濯表示）", "note": "neo-PRO（ポリ100%・日本製）のバックプリント版。タイムセール10/18 23:59まで", "image": "images/nanga-neopro-backprint-ls.jpg", "evidence": "Daytona Park（FREAK'S STORE公式通販・NANGA取扱店）商品ページの洗濯表示：「洗濯機洗い可能, 漂白不可, タンブル乾燥不可, 自然乾燥, アイロン仕上げ可能, ドライクリーニング不可, ウエットクリーニング可能」。素材：ポリエステル100％。価格は2026-10-18 JST表示（タイムセール、参考価格¥9,900）。NANGA公式オンラインショップの商品ページには洗濯表示の記載なし。"}, {"id": "nanga-ecohbd-emb-tee", "category": "半袖T", "brand": "NANGA", "name": "ECO HYBRID BOX LOGO EMBROIDERY TEE", "url": "https://www.daytona-park.com/item/1026328800013", "price": 5247, "listPrice": 5830, "fabric": "ポリエステル 50%、コットン 47%、レーヨン 3%", "status": "ng", "statusDetail": "タンブル乾燥不可（販売店掲載の洗濯表示）", "note": "左胸ミニボックスロゴ刺繍、バインダーネックのレギュラーフィット。タイムセール10/18 23:59まで", "image": "images/nanga-ecohbd-emb-tee.jpg", "evidence": "Daytona Park（FREAK'S STORE公式通販・NANGA取扱店）商品ページの洗濯表示：「洗濯機洗い可能, 漂白不可, タンブル乾燥不可, 自然乾燥, アイロン仕上げ可能, ドライクリーニング不可, ウエットクリーニング可能」。素材：ポリエステル 50%、コットン 47%、レーヨン 3%。価格は2026-10-18 JST表示（タイムセール、参考価格¥5,830）。NANGA公式オンラインショップの商品ページには洗濯表示の記載なし。"}, {"id": "nanga-ecohbd-mt-logo-tee", "category": "半袖T", "brand": "NANGA", "name": "ECO HYBRID MT LOGO TEE", "url": "https://www.daytona-park.com/item/1026328800009", "price": 4664, "listPrice": 5830, "fabric": "ポリエステル50%、コットン47%、レーヨン3%", "status": "ng", "statusDetail": "タンブル乾燥不可（販売店掲載の洗濯表示）", "note": "マウンテンロゴ、ラグランスリーブのレギュラーフィット。タイムセール10/18 23:59まで", "image": "images/nanga-ecohbd-mt-logo-tee.jpg", "evidence": "Daytona Park（FREAK'S STORE公式通販・NANGA取扱店）商品ページの洗濯表示：「洗濯機洗い可能, 漂白不可, タンブル乾燥不可, 自然乾燥, アイロン仕上げ可能, ドライクリーニング不可, ウエットクリーニング可能」。素材：ポリエステル50%、コットン47%、レーヨン3%。価格は2026-10-18 JST表示（タイムセール、参考価格¥5,830）。NANGA公式オンラインショップの商品ページには洗濯表示の記載なし。"}, {"id": "nanga-ecohbd-loose-tee", "category": "半袖T", "brand": "NANGA", "name": "ECO HYBRID BOX LOGO LOOSE FIT TEE（ユニセックス・フリーサイズ）", "url": "https://www.daytona-park.com/item/1026328800014", "price": 4389, "listPrice": 6270, "fabric": "ポリエステル 50%、コットン 47%、レーヨン 3%", "status": "ng", "statusDetail": "タンブル乾燥不可（販売店掲載の洗濯表示）", "note": "ボックスロゴのビッグシルエット・ラグラン。タイムセール10/18 23:59まで", "image": "images/nanga-ecohbd-loose-tee.jpg", "evidence": "Daytona Park（FREAK'S STORE公式通販・NANGA取扱店）商品ページの洗濯表示：「洗濯機洗い可能, 漂白不可, タンブル乾燥不可, 自然乾燥, アイロン仕上げ可能, ドライクリーニング不可, ウエットクリーニング可能」。素材：ポリエステル 50%、コットン 47%、レーヨン 3%。価格は2026-10-18 JST表示（タイムセール、参考価格¥6,270）。NANGA公式オンラインショップの商品ページには洗濯表示の記載なし。"}, {"id": "nanga-neopro-pocket-tee", "category": "半袖T", "brand": "NANGA", "name": "別注 neo-PRO スピンドル ワンポイントロゴ ポケットTシャツ（日本製）", "url": "https://www.daytona-park.com/item/1026328800011", "price": 6160, "listPrice": 7700, "fabric": "ポリエステル100％", "status": "ng", "statusDetail": "タンブル乾燥不可（販売店掲載の洗濯表示）", "note": "ポリ100%の吸水速乾・UVカット、FREAK'S STORE別注。レビュー18件で評価4.89。タイムセール10/18 23:59まで", "image": "images/nanga-neopro-pocket-tee.jpg", "evidence": "Daytona Park（FREAK'S STORE公式通販・NANGA取扱店）商品ページの洗濯表示：「洗濯機洗い可能, 漂白不可, タンブル乾燥不可, 自然乾燥, アイロン仕上げ可能, ドライクリーニング不可, ウエットクリーニング可能」。素材：ポリエステル100％。価格は2026-10-18 JST表示（タイムセール、参考価格¥7,700）。NANGA公式オンラインショップの商品ページには洗濯表示の記載なし。"}, {"id": "nanga-drymix-raglan-tee", "category": "半袖T", "brand": "NANGA", "name": "DRY MIX RAGLAN SLEEVE TEE", "url": "https://www.daytona-park.com/item/1026328800007", "price": 3630, "listPrice": 6050, "fabric": "ポリエステル100％", "status": "ng", "statusDetail": "タンブル乾燥不可（販売店掲載の洗濯表示）", "note": "ポリ100%（吸汗速乾・UVカット・防シワ・防臭）、裾にネームタグのミニマルデザイン。タイムセール10/18 23:59まで", "image": "images/nanga-drymix-raglan-tee.jpg", "evidence": "Daytona Park（FREAK'S STORE公式通販・NANGA取扱店）商品ページの洗濯表示：「洗濯機洗い可能, 漂白不可, タンブル乾燥不可, 自然乾燥, アイロン仕上げ可能, ドライクリーニング可能, ウエットクリーニング可能」。素材：ポリエステル100％。価格は2026-10-18 JST表示（タイムセール、参考価格¥6,050）。NANGA公式オンラインショップの商品ページには洗濯表示の記載なし。"}, {"id": "nanga-fs-emb-logo-tee", "category": "半袖T", "brand": "NANGA", "name": "別注 刺繍 ECO HYBRID LOGO TEE（エコハイブリッド ルーズフィット ロゴ刺繍Tシャツ）", "url": "https://www.daytona-park.com/item/1482328800041", "price": 6256, "listPrice": 7920, "fabric": "本体：ポリエステル50% 綿47% レーヨン3% リブ：ポリエステル47% 綿45% ポリウレタン5% レーヨン3%", "status": "ng", "statusDetail": "タンブル乾燥不可（販売店掲載の洗濯表示）", "note": "前ロゴ刺繍＋バックプリント、FREAK'S STORE限定。タイムセール10/18 23:59まで", "image": "images/nanga-fs-emb-logo-tee.jpg", "evidence": "Daytona Park（FREAK'S STORE公式通販・NANGA取扱店）商品ページの洗濯表示：「洗濯機洗い可能, 漂白不可, タンブル乾燥不可, 自然乾燥, アイロン仕上げ可能, ドライクリーニング不可, ウエットクリーニング可能」。素材：本体：ポリエステル50% 綿47% レーヨン3% リブ：ポリエステル47% 綿45% ポリウレタン5% レーヨン3%。価格は2026-10-18 JST表示（タイムセール、参考価格¥7,920）。NANGA公式オンラインショップの商品ページには洗濯表示の記載なし。"}, {"id": "nanga-drymix-terry-crew", "category": "スウェット・パーカー", "brand": "NANGA", "name": "ドライミックス テリー クルースウェット", "url": "https://www.daytona-park.com/item/1021328800012", "price": 11000, "listPrice": null, "fabric": "ポリエステル100%", "status": "ng", "statusDetail": "タンブル乾燥不可（販売店掲載の洗濯表示）", "note": "ポリ100%のDRYMIX、両脇スパンフライスのヴィンテージ調クルー", "image": "images/nanga-drymix-terry-crew.jpg", "evidence": "Daytona Park（FREAK'S STORE公式通販・NANGA取扱店）商品ページの洗濯表示：「洗濯機洗い可能, 漂白不可, タンブル乾燥不可, 自然乾燥, アイロン仕上げ可能, ドライクリーニング可能, ウエットクリーニング可能」。素材：ポリエステル100%。価格は2026-10-18 JST表示。NANGA公式オンラインショップの商品ページには洗濯表示の記載なし。"}, {"id": "nanga-ecohbd-boxlogo-sweat", "category": "スウェット・パーカー", "brand": "NANGA", "name": "エコハイブリッド ボックスロゴ スウェットシャツ", "url": "https://www.daytona-park.com/item/1021328800015", "price": 11550, "listPrice": null, "fabric": "コットン54%、ポリエステル43%、レーヨン3%", "status": "ng", "statusDetail": "タンブル乾燥不可（販売店掲載の洗濯表示）", "note": "ラグランスリーブ、脇にファスナー付きポケット", "image": "images/nanga-ecohbd-boxlogo-sweat.jpg", "evidence": "Daytona Park（FREAK'S STORE公式通販・NANGA取扱店）商品ページの洗濯表示：「洗濯機洗い可能, 漂白不可, タンブル乾燥不可, 自然乾燥, アイロン仕上げ可能, ドライクリーニング不可, ウエットクリーニング可能」。素材：コットン54%、ポリエステル43%、レーヨン3%。価格は2026-10-18 JST表示。NANGA公式オンラインショップの商品ページには洗濯表示の記載なし。"}, {"id": "nanga-ecohbd-minibox-sweat", "category": "スウェット・パーカー", "brand": "NANGA", "name": "エコハイブリッド ミニボックスロゴ エンブロイダリー スウェットシャツ", "url": "https://www.daytona-park.com/item/1021328800017", "price": 11550, "listPrice": null, "fabric": "本体：ポリエステル54％ 綿43％ レーヨン3％ リブ部分：ポリエステル47％ 綿45％ ポリウレタン5％ レーヨン3％", "status": "ng", "statusDetail": "タンブル乾燥不可（販売店掲載の洗濯表示）", "note": "左胸刺繍のみのシンプルな定番クルースウェット", "image": "images/nanga-ecohbd-minibox-sweat.jpg", "evidence": "Daytona Park（FREAK'S STORE公式通販・NANGA取扱店）商品ページの洗濯表示：「洗濯機洗い可能, 漂白不可, タンブル乾燥不可, 自然乾燥, アイロン仕上げ可能, ドライクリーニング不可, ウエットクリーニング可能」。素材：本体：ポリエステル54％ 綿43％ レーヨン3％ リブ部分：ポリエステル47％ 綿45％ ポリウレタン5％ レーヨン3％。価格は2026-10-18 JST表示。NANGA公式オンラインショップの商品ページには洗濯表示の記載なし。"}, {"id": "nanga-drymix-terry-hoodie", "category": "スウェット・パーカー", "brand": "NANGA", "name": "ドライミックス テリー フーディー", "url": "https://www.daytona-park.com/item/1021328800013", "price": 14300, "listPrice": null, "fabric": "ポリエステル100%", "status": "ng", "statusDetail": "タンブル乾燥不可（販売店掲載の洗濯表示）", "note": "ポリ100%のDRYMIX、首元スナップ付きフーディー", "image": "images/nanga-drymix-terry-hoodie.jpg", "evidence": "Daytona Park（FREAK'S STORE公式通販・NANGA取扱店）商品ページの洗濯表示：「洗濯機洗い可能, 漂白不可, タンブル乾燥不可, 自然乾燥, アイロン仕上げ可能, ドライクリーニング可能, ウエットクリーニング可能」。素材：ポリエステル100%。価格は2026-10-18 JST表示。NANGA公式オンラインショップの商品ページには洗濯表示の記載なし。"}, {"id": "nanga-webbing-dry-chino", "category": "パンツ", "brand": "NANGA", "name": "ウェービングベルトドライチノパンツ", "url": "https://www.daytona-park.com/item/1049328800001", "price": 16500, "listPrice": null, "fabric": "ポリエステル100％", "status": "ng", "statusDetail": "タンブル乾燥不可（販売店掲載の洗濯表示）", "note": "高機能素材CAVE、洗濯後も乾きが早いイージーケア、内蔵ウェービングベルト・テーパード", "image": "images/nanga-webbing-dry-chino.jpg", "evidence": "Daytona Park（FREAK'S STORE公式通販・NANGA取扱店）商品ページの洗濯表示：「洗濯機洗い可能, 漂白不可, タンブル乾燥不可, 自然乾燥, アイロン仕上げ可能, ドライクリーニング不可, ウエットクリーニング可能」。素材：ポリエステル100％。価格は2026-10-18 JST表示。NANGA公式オンラインショップの商品ページには洗濯表示の記載なし。"}, {"id": "nanga-airwarm-fleece-cardigan", "category": "アウター・フリース", "brand": "NANGA", "name": "エアウォーム フリース カーディガン", "url": "https://www.daytona-park.com/item/1059328800005", "price": 19800, "listPrice": null, "fabric": "本体：ポリエステル100％ テープ部分：ポリエステル80％ ポリウレタン20％", "status": "ng", "statusDetail": "タンブル乾燥不可（販売店掲載の洗濯表示）", "note": "POLARTECマイクロフリースのスナップカーディガン（リサイクルポリ）。アイロン不可", "image": "images/nanga-airwarm-fleece-cardigan.jpg", "evidence": "Daytona Park（FREAK'S STORE公式通販・NANGA取扱店）商品ページの洗濯表示：「洗濯機洗い可能, 漂白不可, タンブル乾燥不可, 自然乾燥, アイロン仕上げ不可, ドライクリーニング可能, ウエットクリーニング可能」。素材：本体：ポリエステル100％ テープ部分：ポリエステル80％ ポリウレタン20％。価格は2026-10-18 JST表示。NANGA公式オンラインショップの商品ページには洗濯表示の記載なし。"}, {"id": "nanga-windrex-shell-jacket", "category": "アウター・フリース", "brand": "NANGA", "name": "ウィンドレックス シェルジャケット", "url": "https://www.daytona-park.com/item/1059328800002", "price": 28600, "listPrice": null, "fabric": "ナイロン88％ ポリウレタン12％", "status": "ng", "statusDetail": "タンブル乾燥不可（販売店掲載の洗濯表示）", "note": "防風・撥水・透湿のストレッチソフトシェル（フード付き）", "image": "images/nanga-windrex-shell-jacket.jpg", "evidence": "Daytona Park（FREAK'S STORE公式通販・NANGA取扱店）商品ページの洗濯表示：「洗濯機洗い可能, 漂白不可, タンブル乾燥不可, 自然乾燥, アイロン仕上げ可能, ドライクリーニング不可, ウエットクリーニング可能」。素材：ナイロン88％ ポリウレタン12％。価格は2026-10-18 JST表示。NANGA公式オンラインショップの商品ページには洗濯表示の記載なし。"}, {"id": "fp-ls-twin-tipped-tee", "category": "ロンT", "brand": "FRED PERRY", "name": "Long Sleeve Twin Tipped T-Shirt", "url": "https://www.fredperry.jp/shop/g/gM9602-4550392531492/", "price": 13200, "listPrice": null, "fabric": "本体: 綿100%, トリム: 綿97%, ポリウレタン3%", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "ネックにティップラインを入れたクルーネックの長袖T。軽量コットンジャージー、レギュラーフィット（掲載色 795：NAVY）", "image": "images/fp-ls-twin-tipped-tee.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（795：NAVY）。素材：本体: 綿100%, トリム: 綿97%, ポリウレタン3% レギュラーフィット / ベターコットン / リサイクルポリエステルティッピング / リサイクルポリエステル縫製糸。ケア表記：「手洗い可（詳細は商品の品質表示に記載)」。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込13,200円（通常価格）。"}, {"id": "fp-ringer-tee", "category": "半袖T", "brand": "FRED PERRY", "name": "Ringer T-Shirt", "url": "https://www.fredperry.jp/shop/g/gM3519-4550392699932/", "price": 8800, "listPrice": null, "fabric": "本体: 綿100%, トリム: 綿97%, ポリウレタン3%", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "首回りと袖口にリブのリンガーT。細番手コットンの高密度ジャージー、身幅すっきり・着丈長め（掲載色 738：DARK AIRFORCE）", "image": "images/fp-ringer-tee.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（738：DARK AIRFORCE）。素材：本体: 綿100%, トリム: 綿97%, ポリウレタン3% レギュラーフィット / ベターコットン(BCI) / リサイクルポリエステル縫製糸。ケア表記：「手洗い可（詳細は商品の品質表示に記載)」。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込8,800円（通常価格）。"}, {"id": "fp-relaxed-tee", "category": "半袖T", "brand": "FRED PERRY", "name": "Relaxed T-Shirt", "url": "https://www.fredperry.jp/shop/g/gM3490-4550392694869/", "price": 13200, "listPrice": null, "fabric": "綿100%", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "厚手コットンのポケットT。ドロップショルダーのリラックスフィット（掲載色 608：NAVY）", "image": "images/fp-relaxed-tee.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（608：NAVY）。素材：綿100%。ケア表記：ケア方法の記載なし。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込13,200円（通常価格）。"}, {"id": "fp-taped-track-jacket", "category": "アウター・フリース", "brand": "FRED PERRY", "name": "Taped Track Jacket", "url": "https://www.fredperry.jp/shop/g/gJ4620-4550392186593/", "price": 19800, "listPrice": null, "fabric": "本体: リサイクルポリエステル54%, 綿46%, トリム1: ポリエステル98%, ポリウレタン2%, トリム2: ポリエステル100%", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "定番トリコットのトラックジャケット（ローレルリーステープ）。パンツとセットアップ可（掲載色 198：BLACK）", "image": "images/fp-taped-track-jacket.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（198：BLACK）。素材：本体: リサイクルポリエステル54%, 綿46%, トリム1: ポリエステル98%, ポリウレタン2%, トリム2: ポリエステル100% レギュラーフィット / ベターコットン(BCI) / リサイクルポリエステル縫製糸 / リサイクルYKKテープ / リサイクルポリエステル。ケア表記：「手洗い可（詳細は商品の品質表示に記載)」。タンブル乾燥（乾燥機）の可否は公式ページに記載なし（英国公式 fredperry.com の同品番J4620も「Machine Wash」のみで乾燥機の記載なし）。価格は2026-10-18 JST表示の税込19,800円（通常価格）。"}, {"id": "fp-contrast-tape-track-jacket", "category": "アウター・フリース", "brand": "FRED PERRY", "name": "Contrast Tape Track Jacket", "url": "https://www.fredperry.jp/shop/g/gJ5557-4550392703974/", "price": 19800, "listPrice": null, "fabric": "本体: リサイクルポリエステル54%, 綿46%, トリム1: ポリエステル98%, ポリウレタン2%, トリム2: ポリエステル100%", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "トリコット素材、袖にコントラストのローレルリーステープ（掲載色 248：NAVY）", "image": "images/fp-contrast-tape-track-jacket.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（248：NAVY）。素材：本体: リサイクルポリエステル54%, 綿46%, トリム1: ポリエステル98%, ポリウレタン2%, トリム2: ポリエステル100% ベターコットン(BCI) / リサイクルポリエステル縫製糸 / リサイクルYKKテープ / リサイクルポリエステル。ケア表記：ケア方法の記載なし。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込19,800円（通常価格）。"}, {"id": "fp-tipped-track-jacket", "category": "アウター・フリース", "brand": "FRED PERRY", "name": "Tipped Track Jacket", "url": "https://www.fredperry.jp/shop/g/gJ3302-4550392693596/", "price": 22000, "listPrice": null, "fabric": "リサイクルポリエステル56%, 綿44％", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "クラシックなトリコット、襟の内側に控えめなツインティッピング。定番商品（掲載色 102：BLACK）", "image": "images/fp-tipped-track-jacket.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（102：BLACK）。素材：リサイクルポリエステル56%, 綿44％。ケア表記：ケア方法の記載なし。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込22,000円（通常価格）。"}, {"id": "fp-two-tone-mesh-track-jacket", "category": "アウター・フリース", "brand": "FRED PERRY", "name": "Two Tone Mesh Tape Track Jacket", "url": "https://www.fredperry.jp/shop/g/gJ3306-4550392693671/", "price": 27500, "listPrice": null, "fabric": "リサイクルポリエステル56%, 綿44％", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "袖と肩にツートンのメッシュテープ、ダブルジップ。オーバーサイズフィット（掲載色 738：DARK AIRFORCE）", "image": "images/fp-two-tone-mesh-track-jacket.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（738：DARK AIRFORCE）。素材：リサイクルポリエステル56%, 綿44％。ケア表記：ケア方法の記載なし。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込27,500円（通常価格）。"}, {"id": "fp-waffle-stitch-jumper", "category": "ニット", "brand": "FRED PERRY", "name": "Waffle Stitch Jumper", "url": "https://www.fredperry.jp/shop/g/gK6507-4550392699130/", "price": 24200, "listPrice": null, "fabric": "本体: 綿100%, トリム: 綿92%, ナイロン7%, ポリウレタン1%", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "コットンのミドルゲージ・ワッフル編みクルーネック。袖口にティップライン（掲載色 170：ECRU）", "image": "images/fp-waffle-stitch-jumper.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（170：ECRU）。素材：本体: 綿100%, トリム: 綿92%, ナイロン7%, ポリウレタン1% ベターコットン。ケア表記：ケア方法の記載なし。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込24,200円（通常価格）。"}, {"id": "fp-waffle-half-zip-jumper", "category": "ニット", "brand": "FRED PERRY", "name": "Waffle Stitch Half-Zip Jumper", "url": "https://www.fredperry.jp/shop/g/gK8557-4550392699253/", "price": 25300, "listPrice": null, "fabric": "本体: 綿100%, トリム: 綿80%, ナイロン18%, ポリウレタン2%", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "コットンのワッフル編みハーフジップニット（掲載色 170：ECRU）", "image": "images/fp-waffle-half-zip-jumper.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（170：ECRU）。素材：本体: 綿100%, トリム: 綿80%, ナイロン18%, ポリウレタン2% ベターコットン / リサイクルYKKテープ。ケア表記：ケア方法の記載なし。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込25,300円（通常価格）。"}, {"id": "fp-saddle-sleeve-jumper", "category": "ニット", "brand": "FRED PERRY", "name": "Saddle Sleeve Jumper", "url": "https://www.fredperry.jp/shop/g/gK3303-4550392692223/", "price": 29700, "listPrice": null, "fabric": "RWSウール100%", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "RWSウールのクルーネック、サドルショルダーのリラックスフィット（掲載色 33C：RICH BROWN）", "image": "images/fp-saddle-sleeve-jumper.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（33C：RICH BROWN）。素材：RWSウール100%。ケア表記：ケア方法の記載なし。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込29,700円（通常価格）。"}, {"id": "fp-crew-neck-sweatshirt", "category": "スウェット・パーカー", "brand": "FRED PERRY", "name": "Crew Neck Sweatshirt", "url": "https://www.fredperry.jp/shop/g/gM7535-4935199318697/", "price": 18700, "listPrice": null, "fabric": "本体: 綿100%, トリム: 綿98%, ポリウレタン2%", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "定番ループバックの裏毛クルースウェット、袖口にティップライン（掲載色 248：NAVY）", "image": "images/fp-crew-neck-sweatshirt.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（248：NAVY）。素材：本体: 綿100%, トリム: 綿98%, ポリウレタン2% ベターコットン(BCI) / リサイクルポリエステル縫製糸。ケア表記：「手洗い可（詳細は商品の品質表示に記載)」。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込18,700円（通常価格）。"}, {"id": "fp-tipped-hooded-sweatshirt", "category": "スウェット・パーカー", "brand": "FRED PERRY", "name": "Tipped Hooded Sweatshirt", "url": "https://www.fredperry.jp/shop/g/gM3492-4550392695101/", "price": 20900, "listPrice": null, "fabric": "綿100%", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "裏毛のプルオーバーパーカー、袖口ティップライン。リラックスフィット（掲載色 608：NAVY）", "image": "images/fp-tipped-hooded-sweatshirt.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（608：NAVY）。素材：綿100%。ケア表記：ケア方法の記載なし。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込20,900円（通常価格）。"}, {"id": "fp-tipped-crew-sweatshirt", "category": "スウェット・パーカー", "brand": "FRED PERRY", "name": "Tipped Crew Neck Sweatshirt", "url": "https://www.fredperry.jp/shop/g/gM3495-4550392695149/", "price": 19800, "listPrice": null, "fabric": "綿100%", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "ラグランスリーブの裏毛クルースウェット。リラックスフィット（掲載色 560：ECRU）", "image": "images/fp-tipped-crew-sweatshirt.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（560：ECRU）。素材：綿100%。ケア表記：ケア方法の記載なし。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込19,800円（通常価格）。"}, {"id": "fp-oxford-shirt", "category": "シャツ", "brand": "FRED PERRY", "name": "Oxford Shirt", "url": "https://www.fredperry.jp/shop/g/gM5516-4550392701819/", "price": 19800, "listPrice": null, "fabric": "綿100%", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "ウォッシュ加工のオックスフォード・ボタンダウン長袖シャツ（掲載色 28C：BRANDY）", "image": "images/fp-oxford-shirt.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（28C：BRANDY）。素材：綿100% リサイクルポリエステル芯地 / リサイクルポリエステルティッピング / リサイクルポリエステル縫製糸 / リサイクルポリエステル20%含有釦。ケア表記：ケア方法の記載なし。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込19,800円（通常価格）。"}, {"id": "fp-ripstop-pocket-overshirt", "category": "シャツ", "brand": "FRED PERRY", "name": "Ripstop Pocket Overshirt", "url": "https://www.fredperry.jp/shop/g/gM2402-4550392704209/", "price": 31900, "listPrice": null, "fabric": "リサイクルナイロン100%", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "リップストップナイロンの一重オーバーシャツ（ダブルジップ・胸フラップポケット）（掲載色 184：BLACK）", "image": "images/fp-ripstop-pocket-overshirt.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（184：BLACK）。素材：リサイクルナイロン100%。ケア表記：ケア方法の記載なし。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込31,900円（通常価格）。"}, {"id": "fp-wide-leg-track-pants", "category": "パンツ", "brand": "FRED PERRY", "name": "Wide Leg Track Pants", "url": "https://www.fredperry.jp/shop/g/gT7171-4550392389512/", "price": 19800, "listPrice": null, "fabric": "本体: リサイクルポリエステル54%, 綿46%, トリム: ポリエステル100%", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "トリコットのワイドトラックパンツ（側章ローレルリーステープ）。トラックジャケットとセットアップ可（掲載色 102：BLACK）", "image": "images/fp-wide-leg-track-pants.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（102：BLACK）。素材：本体: リサイクルポリエステル54%, 綿46%, トリム: ポリエステル100% ワイドシルエット / フルレングス / リサイクルポリエステル / リサイクルポリエステル縫製糸。ケア表記：ケア方法の記載なし。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込19,800円（通常価格）。"}, {"id": "fp-shell-track-pants", "category": "パンツ", "brand": "FRED PERRY", "name": "Shell Track Pants", "url": "https://www.fredperry.jp/shop/g/gT3310-4550392695958/", "price": 22000, "listPrice": null, "fabric": "リサイクルナイロン100%", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "リサイクルナイロン100%、ウエストドローコード＋裾ゴム（掲載色 102：BLACK）", "image": "images/fp-shell-track-pants.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（102：BLACK）。素材：リサイクルナイロン100%。ケア表記：ケア方法の記載なし。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込22,000円（通常価格）。"}, {"id": "fp-fly-front-track-pants", "category": "パンツ", "brand": "FRED PERRY", "name": "Fly Front Track Pants", "url": "https://www.fredperry.jp/shop/g/gT2304-4550392665135/", "price": 20900, "listPrice": null, "fabric": "リサイクルポリエステル56%, 綿44%", "status": "unknown", "statusDetail": "公式に乾燥機可否の記載なし（洗濯表示は商品タグ参照）", "note": "やや光沢のあるトリコット、センターステッチ入りのきれいめトラックパンツ（掲載色 608：NAVY）", "image": "images/fp-fly-front-track-pants.jpg", "evidence": "FRED PERRY日本公式（fredperry.jp）商品ページ（608：NAVY）。素材：リサイクルポリエステル56%, 綿44%。ケア表記：ケア方法の記載なし。タンブル乾燥（乾燥機）の可否は公式ページに記載なし。価格は2026-10-18 JST表示の税込20,900円（通常価格）。"}]}</script>
+<script>
+(function(){
+'use strict';
+var PLACEHOLDER = 'images/placeholder.svg';
+var LS_KEY = 'dryerGallery.userItems.v1';
+var CART_KEY = 'dryerGallery.cart.v1';
+var STATUS = {
+  ok:{label:'乾燥機OK（公式確認）',short:'乾燥機OK',cls:'b-ok',rank:0},
+  unknown:{label:'未確認',short:'未確認',cls:'b-unknown',rank:1},
+  ng:{label:'NG',short:'NG',cls:'b-ng',rank:2}
+};
+var $ = function(s){return document.querySelector(s);};
+var seed = [], user = [], cart = [];
+var state = {q:'',statuses:[],brand:'',cat:'',pmin:null,pmax:null,sort:'default',cartOnly:false};
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function yen(n){return '¥'+Number(n).toLocaleString('ja-JP');}
+function safeUrl(u){return /^https?:\/\//i.test(String(u||''))?u:'';}
+function safeImg(u){u=String(u||'');return (/^(https?:|data:image\/|images\/)/i.test(u))?u:'';}
+function num(v){if(v===''||v==null)return null;var n=Number(v);return isFinite(n)?n:null;}
+function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove('show');},2200);}
+
+function loadUser(){try{var a=JSON.parse(localStorage.getItem(LS_KEY)||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}}
+function saveUser(){try{localStorage.setItem(LS_KEY,JSON.stringify(user));}catch(e){toast('保存に失敗しました（ストレージ不可）');}}
+// --- cart (shortlist; keyed by item id) ---
+function loadCart(){try{var a=JSON.parse(localStorage.getItem(CART_KEY)||'[]');return Array.isArray(a)?a.filter(function(c){return c&&c.id;}).map(function(c){return {id:String(c.id),memo:String(c.memo||''),addedAt:c.addedAt||new Date().toISOString()};}):[];}catch(e){return [];}}
+function saveCart(){try{localStorage.setItem(CART_KEY,JSON.stringify(cart));}catch(e){toast('カートを保存できませんでした');}}
+function cartIdx(id){for(var i=0;i<cart.length;i++)if(cart[i].id===id)return i;return -1;}
+function inCart(id){return cartIdx(id)>=0;}
+function byId(){var m={};all().forEach(function(x){m[x.id]=x;});return m;}
+function cartRows(){var m=byId();return cart.map(function(c){return {c:c,x:m[c.id]};}).filter(function(r){return r.x;});}
+function toggleCart(id){var i=cartIdx(id);if(i>=0){cart.splice(i,1);toast('カートから外しました');}else{cart.push({id:id,memo:'',addedAt:new Date().toISOString()});toast('カートに入れました');}saveCart();render();}
+function renderCart(){
+  var rows=cartRows(),n=rows.length,total=0,noPrice=0;
+  rows.forEach(function(r){if(r.x.price!=null)total+=r.x.price;else noPrice++;});
+  var cc=$('#cartCount');cc.textContent=n;cc.classList.toggle('zero',n===0);
+  $('#cartN').textContent=n;$('#cartTotal').textContent=yen(total);
+  var ok=rows.filter(function(r){return r.x.status==='ok';}).length;
+  $('#cartSub').textContent=n?('乾燥機OK '+ok+'点・未確認/NG '+(n-ok)+'点'+(noPrice?'（価格未登録 '+noPrice+'点は合計に含まず）':'')):'';
+  $('#cartList').innerHTML=n?rows.map(function(r){
+    var x=r.x,st=STATUS[x.status],url=safeUrl(x.url),img=safeImg(x.image)||PLACEHOLDER;
+    var onsale=x.listPrice&&x.price!=null&&x.listPrice>x.price;
+    return '<li class="cart-item" data-id="'+esc(x.id)+'"><img src="'+esc(img)+'" alt="" onerror="this.onerror=null;this.src=PLACEHOLDER_SRC"><div>'+
+      '<div class="ci-brand">'+esc(x.brand)+'</div><div class="ci-name">'+esc(x.name)+'</div>'+
+      '<div class="ci-row"><span class="ci-price"'+(onsale?' style="color:var(--ng)"':'')+'>'+(x.price!=null?yen(x.price):'価格未登録')+'</span>'+(onsale?'<s style="color:var(--muted)">'+yen(x.listPrice)+'</s>':'')+
+      '<span class="ci-st '+st.cls+'">'+esc(st.short)+'</span></div>'+
+      '<input class="memo" type="text" placeholder="サイズ・色メモ（例：M / ネイビー）" value="'+esc(r.c.memo)+'" aria-label="サイズ・色メモ">'+
+      '<div class="ci-acts">'+(url?'<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">商品ページ ↗</a>':'')+'<button type="button" data-act="rm">削除</button></div>'+
+      '</div></li>';}).join(''):'<li class="cart-empty">カートは空です。<br>カードの「🛒 カートに入れる」で追加できます。</li>';
+}
+function openCart(){renderCart();$('#cart').classList.add('open');$('#cartOv').classList.add('open');$('#cart').setAttribute('aria-hidden','false');setTimeout(function(){$('#cartClose').focus();},30);}
+function closeCart(){$('#cart').classList.remove('open');$('#cartOv').classList.remove('open');$('#cart').setAttribute('aria-hidden','true');}
+function cartText(){
+  var rows=cartRows(),total=0;
+  var lines=rows.map(function(r,i){var x=r.x;if(x.price!=null)total+=x.price;
+    return (i+1)+'. '+x.brand+' '+x.name+'　'+(x.price!=null?yen(x.price):'価格未登録')+'　['+STATUS[x.status].short+']'+(r.c.memo?'　メモ：'+r.c.memo:'')+(x.url?'\n   '+x.url:'');});
+  return '【気になるリスト】'+rows.length+'点　合計 '+yen(total)+'\n'+lines.join('\n');
+}
+function copyText(s){
+  if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(s);
+  return new Promise(function(res,rej){var ta=document.createElement('textarea');ta.value=s;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy')?res():rej();}catch(e){rej(e);}ta.remove();});
+}
+function all(){
+  return seed.map(function(x,i){return Object.assign({},x,{_src:'seed',_order:i});})
+    .concat(user.map(function(x,i){return Object.assign({},x,{_src:'user',_order:1000+i});}));
+}
+function normalize(x){
+  return {
+    id:String(x.id||('u'+Date.now().toString(36)+Math.random().toString(36).slice(2,6))),
+    category:String(x.category||'').trim()||'未分類',
+    brand:String(x.brand||'').trim(),name:String(x.name||'').trim(),
+    url:String(x.url||'').trim(),price:num(x.price),listPrice:num(x.listPrice),
+    fabric:String(x.fabric||'').trim(),
+    status:STATUS[x.status]?x.status:'unknown',
+    statusDetail:String(x.statusDetail||'').trim(),
+    note:String(x.note||'').trim(),evidence:String(x.evidence||'').trim(),image:String(x.image||'').trim(),
+    addedAt:x.addedAt||new Date().toISOString()
+  };
+}
+
+function fillSelect(sel,values,allLabel){
+  var cur=sel.value;sel.innerHTML='<option value="">'+allLabel+'</option>'+values.map(function(v){return '<option>'+esc(v)+'</option>';}).join('');
+  if(values.indexOf(cur)>=0)sel.value=cur;
+}
+function refreshOptions(){
+  var items=all();
+  var brands=Array.from(new Set(items.map(function(x){return x.brand;}).filter(Boolean))).sort(function(a,b){return a.localeCompare(b,'ja');});
+  var cats=Array.from(new Set(items.map(function(x){return x.category;}).filter(Boolean))).sort(catSort);
+  fillSelect($('#brand'),brands,'すべてのブランド');fillSelect($('#cat'),cats,'すべてのカテゴリ');
+  $('#brandList').innerHTML=brands.map(function(b){return '<option value="'+esc(b)+'">';}).join('');
+  $('#catList').innerHTML=Array.from(new Set(CAT_ORDER.concat(cats))).map(function(c){return '<option value="'+esc(c)+'">';}).join('');
+}
+
+var CAT_ORDER=['ロンT','半袖T','シャツ','スウェット・パーカー','ニット','パンツ','アウター・フリース','ソックス・その他'];
+function catSort(a,b){var ia=CAT_ORDER.indexOf(a),ib=CAT_ORDER.indexOf(b);if(ia<0)ia=99;if(ib<0)ib=99;return ia-ib||a.localeCompare(b,'ja');}
+function renderCatbar(){
+  var counts={};all().forEach(function(x){counts[x.category]=(counts[x.category]||0)+1;});
+  var cats=Object.keys(counts).sort(catSort);
+  var h='<button type="button" class="catchip" data-cat="" aria-pressed="'+(state.cat===''?'true':'false')+'">すべて<small>'+all().length+'</small></button>';
+  cats.forEach(function(c){h+='<button type="button" class="catchip" data-cat="'+esc(c)+'" aria-pressed="'+(state.cat===c?'true':'false')+'">'+esc(c)+'<small>'+counts[c]+'</small></button>';});
+  $('#catbar').innerHTML=h;
+}
+function filtered(){
+  var q=state.q.trim().toLowerCase().normalize('NFKC');
+  var r=all().filter(function(x){
+    if(state.cartOnly&&!inCart(x.id))return false;
+    if(state.statuses.length&&state.statuses.indexOf(x.status)<0)return false;
+    if(state.brand&&x.brand!==state.brand)return false;
+    if(state.cat&&x.category!==state.cat)return false;
+    if(state.pmin!=null&&(x.price==null||x.price<state.pmin))return false;
+    if(state.pmax!=null&&(x.price==null||x.price>state.pmax))return false;
+    if(q){var hay=[x.brand,x.name,x.fabric,x.note,x.evidence,x.category,x.statusDetail,STATUS[x.status].label].join(' ').toLowerCase().normalize('NFKC');
+      if(q.split(/\s+/).some(function(t){return hay.indexOf(t)<0;}))return false;}
+    return true;
+  });
+  var P=function(x){return x.price==null?Infinity:x.price;};
+  r.sort(function(a,b){
+    switch(state.sort){
+      case 'price-asc':return P(a)-P(b)||a._order-b._order;
+      case 'price-desc':return (b.price||0)-(a.price||0)||a._order-b._order;
+      case 'added':return a._order-b._order;
+      default:return STATUS[a.status].rank-STATUS[b.status].rank||P(a)-P(b);
+    }
+  });
+  return r;
+}
+
+function card(x){
+  var st=STATUS[x.status];
+  var onsale=x.listPrice&&x.price!=null&&x.listPrice>x.price;
+  var off=onsale?Math.round((1-x.price/x.listPrice)*100):0;
+  var url=safeUrl(x.url),img=safeImg(x.image)||PLACEHOLDER;
+  var badgeTitle=st.label+(x.statusDetail?'：'+x.statusDetail:'');
+  var ic=inCart(x.id);
+  var h='<article class="card'+(ic?' incart':'')+'" data-id="'+esc(x.id)+'">';
+  h+=(url?'<a class="thumb" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">':'<div class="thumb">');
+  h+='<img loading="lazy" src="'+esc(img)+'" alt="'+esc(x.brand+' '+x.name)+'" onerror="this.onerror=null;this.src=PLACEHOLDER_SRC">';
+  h+='<span class="badge '+st.cls+'" title="'+esc(badgeTitle)+'">'+esc(st.label)+'</span>';
+  if(x._src==='user')h+='<span class="mine">追加</span>';
+  if(ic)h+='<span class="incart-tag">🛒 カート</span>';
+  if(onsale)h+='<span class="sale">'+off+'%OFF</span>';
+  h+=(url?'</a>':'</div>');
+  h+='<div class="body"><div class="brand">'+esc(x.brand)+'</div><h3 class="name">'+esc(x.name)+'</h3>';
+  h+='<div class="prices">'+(x.price!=null?'<span class="now'+(onsale?' onsale':'')+'">'+yen(x.price)+'</span>':'<span class="now">価格未登録</span>')+(onsale?'<span class="list">'+yen(x.listPrice)+'</span>':'')+'</div>';
+  h+='<dl class="meta">';
+  if(x.fabric)h+='<dt>素材</dt><dd>'+esc(x.fabric)+'</dd>';
+  h+='<dt>乾燥機</dt><dd>'+esc(x.statusDetail||st.label)+'</dd>';
+  h+='<dt>カテゴリ</dt><dd>'+esc(x.category)+'</dd></dl>';
+  if(x.note)h+='<p class="note">'+esc(x.note)+'</p>';
+  if(x.evidence)h+='<p class="evidence"><b>根拠</b> '+esc(x.evidence)+'</p>';
+  h+='<div class="actions">'+(url?'<a class="link" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">商品ページ ↗</a>':'<span class="nolink">リンクなし</span>');
+  h+='<button class="cart-add'+(ic?' in':'')+'" data-act="cart" type="button" aria-pressed="'+ic+'">'+(ic?'✓ カートに入れた':'🛒 カートに入れる')+'</button>';
+  if(x._src==='user')h+='<button class="btn small" data-act="edit" type="button">編集</button><button class="btn small danger" data-act="del" type="button">削除</button>';
+  h+='</div></div></article>';
+  return h;
+}
+
+function render(){
+  renderCatbar();
+  var r=filtered(),total=all().length;
+  $('#grid').innerHTML=r.length?r.map(card).join(''):'<div class="empty">条件に合うアイテムがありません。<br>フィルターを変更してください。</div>';
+  var c={ok:0,unknown:0,ng:0};r.forEach(function(x){c[x.status]++;});
+  $('#count').textContent=r.length+' / '+total+' 件表示　（OK '+c.ok+'・未確認 '+c.unknown+'・NG '+c.ng+'）'+(state.cartOnly?'　🛒カートのみ':'');
+  renderCart();
+}
+
+// --- filters ---
+$('#q').addEventListener('input',function(e){state.q=e.target.value;render();});
+$('#brand').addEventListener('change',function(e){state.brand=e.target.value;render();});
+$('#cat').addEventListener('change',function(e){state.cat=e.target.value;render();});
+$('#catbar').addEventListener('click',function(e){var b=e.target.closest('.catchip');if(!b)return;state.cat=b.dataset.cat;$('#cat').value=state.cat;render();});
+$('#pmin').addEventListener('input',function(e){state.pmin=num(e.target.value);render();});
+$('#pmax').addEventListener('input',function(e){state.pmax=num(e.target.value);render();});
+$('#sort').addEventListener('change',function(e){state.sort=e.target.value;render();});
+function toggleChip(ch){
+  var on=ch.getAttribute('aria-pressed')!=='true';ch.setAttribute('aria-pressed',String(on));
+  state.statuses=Array.from(document.querySelectorAll('#statusChips .chip[data-s][aria-pressed="true"]')).map(function(c){return c.dataset.s;});render();
+}
+document.querySelectorAll('#statusChips .chip[data-s]').forEach(function(ch){
+  ch.addEventListener('click',function(){toggleChip(ch);});
+  ch.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleChip(ch);}});
+});
+function toggleCartOnly(){var ch=$('#cartOnly');state.cartOnly=ch.getAttribute('aria-pressed')!=='true';ch.setAttribute('aria-pressed',String(state.cartOnly));render();}
+$('#cartOnly').addEventListener('click',toggleCartOnly);
+$('#cartOnly').addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleCartOnly();}});
+$('#cartBtn').addEventListener('click',openCart);
+$('#cartClose').addEventListener('click',closeCart);
+$('#cartOv').addEventListener('click',closeCart);
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&$('#cart').classList.contains('open'))closeCart();});
+$('#cartList').addEventListener('click',function(e){var b=e.target.closest('button[data-act="rm"]');if(!b)return;var i=cartIdx(b.closest('.cart-item').dataset.id);if(i>=0){cart.splice(i,1);saveCart();render();toast('カートから外しました');}});
+$('#cartList').addEventListener('input',function(e){if(!e.target.classList.contains('memo'))return;var i=cartIdx(e.target.closest('.cart-item').dataset.id);if(i>=0){cart[i].memo=e.target.value;saveCart();}});
+$('#cartCopy').addEventListener('click',function(){if(!cartRows().length){toast('カートは空です');return;}copyText(cartText()).then(function(){toast('リストをコピーしました');},function(){window.prompt('コピーしてください',cartText());});});
+$('#cartClear').addEventListener('click',function(){if(!cart.length)return;if(confirm('カートを空にしますか？')){cart=[];saveCart();render();toast('カートを空にしました');}});
+$('#moreToggle').addEventListener('click',function(){$('#more').classList.toggle('open');});
+$('#reset').addEventListener('click',function(){
+  state={q:'',statuses:[],brand:'',cat:'',pmin:null,pmax:null,sort:'default',cartOnly:false};$('#cartOnly').setAttribute('aria-pressed','false');
+  ['#q','#brand','#cat','#pmin','#pmax'].forEach(function(s){$(s).value='';});$('#sort').value='default';
+  document.querySelectorAll('#statusChips .chip[data-s]').forEach(function(c){c.setAttribute('aria-pressed','false');});render();
+});
+
+// --- add / edit / delete ---
+var dlg=$('#dlg'),form=$('#form');
+function openForm(item){
+  form.reset();$('#dlgTitle').textContent=item?'アイテム編集':'アイテム追加';
+  var f=form.elements;
+  if(item){['id','url','brand','category','name','price','listPrice','fabric','status','statusDetail','evidence','note','image'].forEach(function(k){f[k].value=item[k]==null?'':item[k];});}
+  else{f.id.value='';f.category.value='ロンT';f.status.value='unknown';}
+  updatePreview();
+  if(dlg.showModal)dlg.showModal();else dlg.setAttribute('open','');
+  setTimeout(function(){f[item?'name':'url'].focus();},30);
+}
+function closeForm(){if(dlg.close)dlg.close();else dlg.removeAttribute('open');}
+function updatePreview(){var u=safeImg(form.elements.image.value);var pv=$('#pv');pv.onerror=function(){pv.onerror=null;pv.src=PLACEHOLDER;};pv.src=u||PLACEHOLDER;}
+form.elements.image.addEventListener('input',updatePreview);
+$('#addBtn').addEventListener('click',function(){openForm(null);});
+$('#cancelBtn').addEventListener('click',closeForm);
+form.addEventListener('submit',function(e){
+  e.preventDefault();
+  var f=form.elements,data={};
+  ['id','url','brand','category','name','price','listPrice','fabric','status','statusDetail','evidence','note','image'].forEach(function(k){data[k]=f[k].value;});
+  if(!data.brand.trim()||!data.name.trim()||num(data.price)==null){toast('ブランド・商品名・価格は必須です');return;}
+  if(data.url&&!safeUrl(data.url)){toast('URLは http(s):// で始めてください');return;}
+  var idx=user.findIndex(function(x){return x.id===data.id;});
+  if(idx>=0){var it=normalize(Object.assign({},user[idx],data));it.addedAt=user[idx].addedAt;user[idx]=it;toast('更新しました');}
+  else{data.id='';user.push(normalize(data));toast('追加しました');}
+  saveUser();refreshOptions();render();closeForm();
+});
+$('#grid').addEventListener('click',function(e){
+  var b=e.target.closest('button[data-act]');if(!b)return;
+  if(b.dataset.act==='cart'){toggleCart(b.closest('.card').dataset.id);return;}
+  var id=b.closest('.card').dataset.id,idx=user.findIndex(function(x){return x.id===id;});if(idx<0)return;
+  if(b.dataset.act==='edit')openForm(user[idx]);
+  else if(confirm('「'+user[idx].name+'」を削除しますか？')){user.splice(idx,1);saveUser();var ci=cartIdx(id);if(ci>=0){cart.splice(ci,1);saveCart();}refreshOptions();render();toast('削除しました');}
+});
+
+// --- export / import ---
+$('#exportBtn').addEventListener('click',function(){
+  var includeSeed=confirm('初期データも含めてエクスポートしますか？\n［OK］全アイテム　［キャンセル］追加分のみ');
+  var items=includeSeed?all().map(function(x){var y=Object.assign({},x);delete y._src;delete y._order;return y;}):user;
+  var blob=new Blob([JSON.stringify({app:'dryer-gallery',version:1,exportedAt:new Date().toISOString(),items:items,cart:cart},null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='dryer-gallery-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
+  toast(items.length+'件・カート'+cart.length+'点をエクスポートしました');
+});
+$('#importBtn').addEventListener('click',function(){$('#importFile').click();});
+$('#importFile').addEventListener('change',function(e){
+  var file=e.target.files[0];if(!file)return;
+  var rd=new FileReader();
+  rd.onload=function(){
+    try{
+      var d=JSON.parse(rd.result),arr=Array.isArray(d)?d:(d.items||[]);
+      if(!Array.isArray(arr))throw new Error('format');
+      var seedIds=new Set(seed.map(function(x){return x.id;})),added=0,updated=0;
+      arr.forEach(function(raw){
+        if(!raw||!raw.name||!raw.brand)return;
+        if(seedIds.has(raw.id))return; // 初期データは取り込まない
+        var it=normalize(raw),i=user.findIndex(function(x){return x.id===it.id;});
+        if(i>=0){user[i]=it;updated++;}else{user.push(it);added++;}
+      });
+      var cAdded=0;
+      if(d&&Array.isArray(d.cart)){d.cart.forEach(function(c){if(!c||!c.id)return;var i=cartIdx(String(c.id));if(i>=0){if(c.memo)cart[i].memo=String(c.memo);}else{cart.push({id:String(c.id),memo:String(c.memo||''),addedAt:c.addedAt||new Date().toISOString()});cAdded++;}});saveCart();}
+      saveUser();refreshOptions();render();toast('インポート：追加 '+added+'件・更新 '+updated+'件・カート '+cAdded+'点');
+    }catch(err){toast('JSONを読み込めませんでした');}
+    e.target.value='';
+  };
+  rd.readAsText(file);
+});
+
+// --- boot ---
+window.PLACEHOLDER_SRC=PLACEHOLDER;
+function boot(data){seed=(data&&data.items||[]).map(function(x){var n=normalize(x);n.id=x.id;return n;});user=loadUser();cart=loadCart();refreshOptions();render();}
+var inline=null;try{inline=JSON.parse(document.getElementById('seed-data').textContent);}catch(e){}
+if(location.protocol.indexOf('http')===0&&!false){
+  fetch('data.json',{cache:'no-cache'}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(boot).catch(function(){boot(inline);});
+}else{boot(inline);}
+})();
+</script>
+</body>
+</html>
